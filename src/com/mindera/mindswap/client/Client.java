@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.Iterator;
 
 public class Client implements Runnable {
     private BufferedReader in;
@@ -31,21 +32,45 @@ public class Client implements Runnable {
     @Override
     public void run() {
 
+        // check for unused connections
+        Thread checkServerConnection = new Thread(() -> {
+            try {
+                while (true) {
+                    if (this.socket.isClosed() || this.socket.isInputShutdown() || this.socket.isOutputShutdown()) {
+                        System.out.println("Connection to the server lost.");
+                        this.socket.close();
+                        return;
+                    }
+                    Thread.sleep(1000);
+                }
+            } catch (InterruptedException | IOException e) {
+                throw new RuntimeException(e);
+            }
+
+        });
+        checkServerConnection.start();
+
         // read thread
         Thread read = new Thread(() -> {
-            while (this.socket != null && !socket.isClosed()) {
+            while (!socket.isClosed()) {
                 try {
                     // current read stream from the server ie stuff that the server sends will be here
                     in = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
-                    String message = in.readLine();
-                    if (message == null) {
-                        this.close();
-                        return;
+
+                    Iterator<String> it = in.lines().iterator();
+                    while (it.hasNext()) {
+                        String message = it.next();
+                        if (message == null) {
+                            this.close();
+                            return;
+                        }
+
+                        System.out.printf("%s\n", message);
                     }
-                    System.out.printf("%s\n", message);
+
                 } catch (IOException e) {
                     System.out.println("No connection to the server.");
-                    return;
+                    break;
                     //throw new RuntimeException(e);
                 }
             }
@@ -55,7 +80,7 @@ public class Client implements Runnable {
         Thread write = new Thread(() -> {
             String command;
             BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-            while (this.socket != null && !socket.isClosed()) {
+            while (!socket.isClosed()) {
                 try {
                     // current write stream to the server ie stuff we write here will go to the server
                     out = new PrintWriter(this.socket.getOutputStream(), true);
@@ -66,13 +91,20 @@ public class Client implements Runnable {
 
                 if (command.equals("/exit")) {
                     try {
-                        out.println("Goodbye!");
+                        System.out.println("Goodbye!");
+                        out.println("/exit");
                         this.close();
                         return;
+
                     } catch (IOException e) {
-                        throw new RuntimeException(e);
+                        System.out.println("No connection to the server.");
+                        try {
+                            this.close();
+                        } catch (IOException ex) {
+                            throw new RuntimeException(ex);
+                        }
+                        break;
                     }
-                    //break;
                 }
 
                 out.println(command); //send to server the command

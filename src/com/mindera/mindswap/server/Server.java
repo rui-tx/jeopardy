@@ -3,6 +3,7 @@ package com.mindera.mindswap.server;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
@@ -10,14 +11,16 @@ import java.util.concurrent.Executors;
 
 public class Server {
 
+    private static final int MAX_CLIENTS = 3;
     private final String PRETTY_NAME = "Jeopardy Server";
     private final String HOST = "localhost";
     private final int PORT = 15000;
-
     private final List<ClientHandler> connectionList = new CopyOnWriteArrayList<>();
     private final ExecutorService threadPool = Executors.newCachedThreadPool();
-    private ServerSocket socket;
 
+    private ServerSocket socket;
+    private boolean gameStarted = false;
+    private boolean gameCanStart = false;
 
     public Server() {
     }
@@ -31,6 +34,10 @@ public class Server {
 
             synchronized (server) {
                 clientSocket = this.initClientConnection(server); // blocking method
+            }
+
+            if (clientSocket == null) {
+                continue;
             }
 
             ClientHandler newClient = new ClientHandler(clientSocket);
@@ -47,6 +54,16 @@ public class Server {
         try {
             socket = serverSocket.accept();
             System.out.println("Client connected");
+
+            if (connectionList.size() >= MAX_CLIENTS) {
+                System.out.println("Server is full. Kicking client.");
+                PrintWriter out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()));
+                out.println("Server is full. Please try again later.");
+                out.flush();
+                socket.close();
+                return null;
+            }
+
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return null;
@@ -59,26 +76,95 @@ public class Server {
 
         try {
             this.socket = new ServerSocket(PORT);
+
+            // check for enough players
+            Thread waitForPlayers = new Thread(() -> {
+                try {
+                    while (true) {
+                        if (connectionList.size() == MAX_CLIENTS) {
+                            broadcast("Server", "Game is about to start. Please wait...");
+                            gameStart();
+                            Thread.currentThread().interrupt();
+                        }
+                        Thread.sleep(5000);
+                    }
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+
+            });
+            waitForPlayers.start();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         System.out.printf("[server]> Server created at port %d. Ready to accept connections.\n", PORT);
+
         return this.socket;
+    }
+
+    private void gameStart() {
+        ///broadcast("Server", "Game is starting...");
+        gameStarted = true;
+
+        // lock all players
+        for (ClientHandler currentPlayer : connectionList) {
+            currentPlayer.locked = true;
+        }
+
+        // while game has not ended
+        while (true) {
+            // unlocks the 1st player
+            connectionList.getFirst().locked = false;
+
+            Iterator<ClientHandler> it = connectionList.iterator();
+            while (it.hasNext()) {
+                ClientHandler currentPlayer = it.next();
+
+                broadcast("Server ", currentPlayer.getName() + ", it's your turn!");
+                // wait for a player to answer
+                String answer = this.waitForAnswer(currentPlayer);
+                currentPlayer.locked = true;
+            }
+
+        }
+    }
+
+    private String waitForAnswer(ClientHandler client) {
+        String answer;
+
+        try {
+            answer = client.in.readLine();
+            //send("Server " + client.getName() + " answered: " + answer);
+            System.out.println("Server " + client.getName() + " answered: " + answer);
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return answer;
+    }
+
+    private void broadcast(String name, String message) {
+        for (ClientHandler client : this.connectionList) {
+            client.send(name + ": " + message);
+        }
     }
 
 
     public class ClientHandler implements Runnable {
 
         private final PrintWriter out;
+        private final BufferedReader in;
         private Socket socket;
         private String clientName;
-        private BufferedReader in;
         private String message;
+        private boolean locked;
 
         public ClientHandler(Socket socket) {
             this.socket = socket;
             this.clientName = "default";
+            this.locked = false;
 
             try {
                 in = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
@@ -86,32 +172,51 @@ public class Server {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-
         }
 
         @Override
         public void run() {
-
             connectionList.add(this);
             this.changeName();
-            
+            this.welcome();
+
             while (!socket.isClosed()) {
                 try {
                     message = in.readLine();
 
-                    if (message.isEmpty()) {
-                        out.println("Empty message");
+                    if (this.locked) {
+                        out.println("You are locked. Please wait for the current player to finish.");
                         out.flush();
                         continue;
                     }
+                    if (message.isEmpty()) {
+                        continue;
+                    }
 
-                    this.broadcast(clientName, message);
+                    if (message.equals("/exit")) {
+                        closeConnection();
+                        break;
+                    }
+
+                    if (!gameStarted) {
+                        this.broadcast(clientName, message);
+                    }
 
                 } catch (IOException e) {
                     System.out.println(e.getMessage());
-                    //removeClient(this);
                 }
             }
+        }
+
+        private void closeConnection() {
+            try {
+                this.socket.close();
+                System.out.println("Client disconnected");
+                connectionList.remove(this);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
         }
 
         private void changeName() {
@@ -144,8 +249,17 @@ public class Server {
                     throw new RuntimeException(e);
                 }
             }
+        }
 
-
+        private void welcome() {
+            synchronized (out) {
+                out.println("Welcome to the Jeopardy server!");
+                out.println("You are on the chat lobby. When enough players are connected, the game will start.");
+                out.println("To chat with other players, just type and press <Enter>.");
+                out.println("Type /help to see the list of commands.");
+                out.println("Type /exit to exit.");
+                out.flush();
+            }
         }
 
         public void broadcast(String name, String message) {
@@ -154,12 +268,16 @@ public class Server {
                     .forEach(client -> client.send(name + ": " + message));
         }
 
+        public void sendToAll(String name, String message) {
+            connectionList
+                    .forEach(client -> client.send(name + ": " + message));
+        }
+
         public void send(String message) {
             synchronized (out) {
                 out.println(message);
                 out.flush();
             }
-
         }
 
         public String getName() {
