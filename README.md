@@ -28,6 +28,6 @@ Jeopardike is a project made by Pedro and Rui for Mindera MindSwap Bootcamp.
 
 ### Client Side
 
-- [ ] Client connection to the server
+- [ ] Client connection to the com.mindera.mindswap.server
 - [ ] Calculate answer time
 
