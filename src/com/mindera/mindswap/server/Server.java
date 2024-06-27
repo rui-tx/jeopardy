@@ -11,7 +11,7 @@ import java.util.concurrent.Executors;
 
 public class Server {
 
-    private static final int MAX_CLIENTS = 3;
+    private static final int MAX_CLIENTS = 2;
     private final String PRETTY_NAME = "Jeopardy Server";
     private final String HOST = "localhost";
     private final int PORT = 15000;
@@ -110,20 +110,30 @@ public class Server {
         // lock all players
         for (ClientHandler currentPlayer : connectionList) {
             currentPlayer.locked = true;
+
         }
 
         // while game has not ended
         while (true) {
             // unlocks the 1st player
-            connectionList.getFirst().locked = false;
+            //connectionList.getFirst().locked = false;
 
             Iterator<ClientHandler> it = connectionList.iterator();
             while (it.hasNext()) {
                 ClientHandler currentPlayer = it.next();
+                System.out.println(currentPlayer.clientName);
+                currentPlayer.locked = false;
 
-                broadcast("Server ", currentPlayer.getName() + ", it's your turn!");
+                broadcast("Server", currentPlayer.getName() + ", it's your turn!");
                 // wait for a player to answer
+                //String answer = this.waitForAnswer(currentPlayer);
+                currentPlayer.waitForAnswer = true;
+
+                //needs blocking method but this is not working
                 String answer = this.waitForAnswer(currentPlayer);
+
+                System.out.println("Server " + currentPlayer.getName() + " answered: " + currentPlayer.answer);
+                currentPlayer.waitForAnswer = false;
                 currentPlayer.locked = true;
             }
 
@@ -135,9 +145,6 @@ public class Server {
 
         try {
             answer = client.in.readLine();
-            //send("Server " + client.getName() + " answered: " + answer);
-            System.out.println("Server " + client.getName() + " answered: " + answer);
-
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -160,11 +167,15 @@ public class Server {
         private String clientName;
         private String message;
         private boolean locked;
+        private boolean waitForAnswer;
+        private String answer;
 
         public ClientHandler(Socket socket) {
             this.socket = socket;
             this.clientName = "default";
             this.locked = false;
+            this.waitForAnswer = false;
+            this.answer = "";
 
             try {
                 in = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
@@ -184,12 +195,22 @@ public class Server {
                 try {
                     message = in.readLine();
 
+                    if (message.isEmpty()) {
+                        continue;
+                    }
+
+                    if (!gameStarted) {
+                        this.broadcast(clientName, message);
+                    }
+
                     if (this.locked) {
                         out.println("You are locked. Please wait for the current player to finish.");
                         out.flush();
                         continue;
                     }
-                    if (message.isEmpty()) {
+
+                    if (gameStarted && waitForAnswer) {
+                        this.answer = message;
                         continue;
                     }
 
@@ -198,9 +219,6 @@ public class Server {
                         break;
                     }
 
-                    if (!gameStarted) {
-                        this.broadcast(clientName, message);
-                    }
 
                 } catch (IOException e) {
                     System.out.println(e.getMessage());

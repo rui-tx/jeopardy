@@ -74,6 +74,12 @@ public class Client implements Runnable {
                     //throw new RuntimeException(e);
                 }
             }
+
+            try {
+                this.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         });
 
         // write thread
@@ -109,6 +115,12 @@ public class Client implements Runnable {
 
                 out.println(command); //send to server the command
                 out.flush();
+            }
+            
+            try {
+                this.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         });
 
