@@ -5,6 +5,8 @@ import java.net.Socket;
 
 public class Client {
 
+    private boolean locked = false;
+
     public static void main(String[] args) {
         Client client = new Client();
         try {
@@ -23,12 +25,25 @@ public class Client {
         new Thread(new KeyboardHandler(out, socket)).start();
         String line;
         while ((line = in.readLine()) != null) {
+
+            if (line.equals("/lock")) {
+                locked = true;
+                System.out.println("You are locked out!");
+                continue;
+            }
+
+            if (line.equals("/unlock")) {
+                locked = false;
+                System.out.println("You are now unlocked.");
+                continue;
+            }
+
             System.out.println(line);
         }
         socket.close();
     }
 
-    private static class KeyboardHandler implements Runnable {
+    private class KeyboardHandler implements Runnable {
         private final BufferedWriter out;
         private final Socket socket;
         private final BufferedReader in;
@@ -46,6 +61,11 @@ public class Client {
                 try {
                     String line = in.readLine();
 
+                    if (locked) {
+                        System.out.println("You are locked out!");
+                        continue;
+                    }
+
                     out.write(line);
                     out.newLine();
                     out.flush();
@@ -54,6 +74,7 @@ public class Client {
                         socket.close();
                         System.exit(0);
                     }
+
                 } catch (IOException e) {
                     System.out.println("Server connection lost...");
                     try {

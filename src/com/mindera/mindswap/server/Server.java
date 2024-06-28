@@ -13,17 +13,19 @@ import java.util.concurrent.Executors;
 
 public class Server {
 
-    private final int MAX_CLIENTS = 2;
+    private final int MAX_CLIENTS = 3;
 
     private final List<ClientConnectionHandler> clients;
     private ServerSocket serverSocket;
     private int port;
     private ExecutorService threads;
+    private boolean gameStarted;
 
 
     public Server(int port) {
         clients = new CopyOnWriteArrayList<>();
         this.port = port;
+        this.gameStarted = false;
     }
 
     public void start() {
@@ -35,13 +37,27 @@ public class Server {
             serverSocket = new ServerSocket(port);
             threads = Executors.newCachedThreadPool();
             System.out.printf("Server started on port %d", port);
+
+            // check if there are enough clients to start the game
+            threads.submit(new Thread(() -> {
+                while (clients.size() < MAX_CLIENTS) {
+                    try {
+                        Thread.sleep(10000);
+                        System.out.println("Waiting for clients...");
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                broadcast("[server]", "Game will start in 10 seconds.");
+                gameStart();
+            }));
+
             while (true) {
                 acceptConnection();
             }
         } catch (IOException e) {
             System.out.println("Error starting server");
         }
-
     }
 
     public void acceptConnection() throws IOException {
@@ -74,6 +90,24 @@ public class Server {
 
     public void gameStart() {
         clients.forEach(handler -> handler.send("Game started!"));
+        this.gameStarted = true;
+
+        while (true) {
+            gameTurn();
+        }
+
+    }
+
+    private void gameTurn() {
+        for (ClientConnectionHandler handler : clients) {
+            handler.send("/unlock");
+            handler.send("It's your turn!");
+
+            String answer = handler.getAnswer();
+            System.out.println(answer);
+
+            handler.send("/lock");
+        }
     }
 
     public class ClientConnectionHandler implements Runnable {
@@ -98,33 +132,30 @@ public class Server {
             addClient(this);
             changeName();
             welcome();
+            send("/lock");
 
             broadcast("[server]", this.getName() + " connected");
-
-            while (in.hasNext()) {
-                getAnswer();
-
-                if (message.isEmpty()) {
-                    continue;
-                }
-                //broadcast(name, message);
-            }
         }
 
-        public String getAnswer() {
+        public synchronized String getAnswer() {
+            String newMessage = "";
             try {
-                message = in.nextLine();
+                System.out.println("Waiting for answer...");
+                newMessage = in.nextLine();
+                System.out.println("Answer received: " + newMessage);
+
             } catch (NullPointerException e) {
                 System.out.println(e.getMessage());
                 removeClient(this);
-            } finally {
-                if (message == null) {
-                    System.out.println("Client disconnected");
-                    removeClient(this);
-                }
             }
 
+            if (newMessage == null) {
+                System.out.println("Client disconnected");
+                removeClient(this);
+            }
+            this.message = newMessage;
             return this.message;
+
         }
 
         public void changeName() {
