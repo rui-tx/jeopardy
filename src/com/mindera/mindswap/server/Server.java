@@ -63,8 +63,7 @@ public class Server {
 
     private void addClient(ClientConnectionHandler cHandler) {
         clients.add(cHandler);
-        cHandler.send(cHandler.getName());
-        broadcast(cHandler.getName(), "connected");
+        //cHandler.send(cHandler.getName());
     }
 
     public void broadcast(String name, String message) {
@@ -77,35 +76,77 @@ public class Server {
 
         private final Socket clientSocket;
         private final BufferedWriter out;
-        private final String name;
+        private final Scanner in;
+        private String name;
         private String message;
 
         public ClientConnectionHandler(Socket clientSocket, String name) throws IOException {
             this.clientSocket = clientSocket;
             this.name = name;
             this.out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
+            this.in = new Scanner(clientSocket.getInputStream());
         }
 
         @Override
         public void run() {
             addClient(this);
-            Scanner in;
-            try {
-                in = new Scanner(clientSocket.getInputStream());
-            } catch (IOException e) {
-                System.out.println(e.getMessage());
-                removeClient(this);
-                return;
-            }
+            changeName();
+            welcome();
+
+            broadcast("[server]", this.getName() + " connected");
 
             while (in.hasNext()) {
-                message = in.nextLine();
+                getAnswer();
+
                 if (message.isEmpty()) {
                     continue;
                 }
 
                 broadcast(name, message);
             }
+        }
+
+        public String getAnswer() {
+            try {
+                message = in.nextLine();
+            } catch (NullPointerException e) {
+                System.out.println(e.getMessage());
+                removeClient(this);
+            } finally {
+                if (message == null) {
+                    System.out.println("Client disconnected");
+                    removeClient(this);
+                }
+            }
+
+            return this.message;
+        }
+
+        public void changeName() {
+            while (!name.matches("[a-zA-Z]+")) {
+                try {
+                    out.write("Please enter a your name:");
+                    out.newLine();
+                    out.flush();
+                    name = getAnswer();
+
+                    /*
+                    boolean isNameTaken = clients.stream()
+                            .anyMatch(client -> client.getName().equals(newName));
+                    if (isNameTaken) {
+                        out.write("Name already taken. Please enter a different name");
+                        out.flush();
+                    }
+                    nameValid = true;
+                     */
+
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+
+            }
+
+
         }
 
         public void removeClient(ClientConnectionHandler cHandler) {
@@ -133,6 +174,12 @@ public class Server {
             } catch (IOException e) {
                 System.out.println("Error closing client");
             }
+        }
+
+        private void welcome() {
+            String welcomeMessage = "Welcome to the Jeopardy server!\n" +
+                    "You are on the chat lobby. When enough players are connected, the game will start.";
+            send(welcomeMessage);
         }
 
         public String getName() {
