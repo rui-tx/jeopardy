@@ -55,7 +55,7 @@ public class Client {
                         System.exit(0);
                     }
                 } catch (IOException e) {
-                    System.out.println("Something went wrong with the server. Connection closing...");
+                    System.out.println("Server connection lost...");
                     try {
                         socket.close();
                     } catch (IOException ex) {

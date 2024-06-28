@@ -13,6 +13,8 @@ import java.util.concurrent.Executors;
 
 public class Server {
 
+    private final int MAX_CLIENTS = 2;
+
     private final List<ClientConnectionHandler> clients;
     private ServerSocket serverSocket;
     private int port;
@@ -44,6 +46,17 @@ public class Server {
 
     public void acceptConnection() throws IOException {
         Socket clientSocket = serverSocket.accept();
+        if (clients.size() + 1 > MAX_CLIENTS) {
+            BufferedWriter out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
+            String message = "Server is full, please try again later.";
+            out.write(message);
+            out.newLine();
+            out.flush();
+            out.close();
+            clientSocket.close();
+            return;
+        }
+
         ClientConnectionHandler clientConnectionHandler = new ClientConnectionHandler(clientSocket, "client" + clients.size());
         threads.submit(clientConnectionHandler);
     }
