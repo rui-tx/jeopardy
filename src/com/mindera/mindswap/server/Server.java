@@ -72,6 +72,10 @@ public class Server {
                 .forEach(handler -> handler.send(name + ": " + message));
     }
 
+    public void gameStart() {
+        clients.forEach(handler -> handler.send("Game started!"));
+    }
+
     public class ClientConnectionHandler implements Runnable {
 
         private final Socket clientSocket;
@@ -79,12 +83,14 @@ public class Server {
         private final Scanner in;
         private String name;
         private String message;
+        private boolean gameTurn;
 
         public ClientConnectionHandler(Socket clientSocket, String name) throws IOException {
             this.clientSocket = clientSocket;
             this.name = name;
             this.out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
             this.in = new Scanner(clientSocket.getInputStream());
+            this.gameTurn = false;
         }
 
         @Override
@@ -101,8 +107,7 @@ public class Server {
                 if (message.isEmpty()) {
                     continue;
                 }
-
-                broadcast(name, message);
+                //broadcast(name, message);
             }
         }
 
@@ -143,10 +148,7 @@ public class Server {
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-
             }
-
-
         }
 
         public void removeClient(ClientConnectionHandler cHandler) {
@@ -178,7 +180,7 @@ public class Server {
 
         private void welcome() {
             String welcomeMessage = "Welcome to the Jeopardy server!\n" +
-                    "You are on the chat lobby. When enough players are connected, the game will start.";
+                    "When enough players are connected, the game will start.";
             send(welcomeMessage);
         }
 
