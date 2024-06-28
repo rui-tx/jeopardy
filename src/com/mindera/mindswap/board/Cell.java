@@ -2,6 +2,7 @@ package com.mindera.mindswap.board;
 
 import java.util.ArrayList;
 
+
 public class Cell {
     Question question;
     ArrayList<Answer> answers;
