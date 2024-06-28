@@ -31,12 +31,9 @@ public class Main {
 
         Scanner scanner = new Scanner(System.in);
         while (true) {
-            System.out.print("Enter row (0-3): ");
-            int row = scanner.nextInt();
-            System.out.print("Enter col (0-3): ");
-            int col = scanner.nextInt();
-
-            gameBoard.selectCell(row, col);
+            System.out.print("Enter question number (1-16): ");
+            int questionNumber = scanner.nextInt();
+            gameBoard.selectQuestion(questionNumber);
         }
 
         /*

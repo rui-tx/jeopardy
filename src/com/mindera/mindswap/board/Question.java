@@ -5,8 +5,6 @@ public class Question {
     String id;
     String category;
     String questionText;
-    int row;
-    int col;
 
     public Question(String id, String category, String questionText) {
         this.id = id;
