@@ -12,14 +12,16 @@ import java.util.Scanner;
 import static com.mindera.mindswap.Constants.ANSWERS_FILE_PATH;
 import static com.mindera.mindswap.Constants.QUESTIONS_FILE_PATH;
 
+import com.mindera.mindswap.server.Server;
 
 public class Main {
     public static void main(String[] args) {
 
+        Server server = new Server(15000);
+        server.start();
+      
         Map<String, ArrayList<Question>> questionsByCategory = getQuestions();
-
         Map<String, ArrayList<Answer>> answersById = getAnswers();
-
 
         Board gameBoard = new Board(questionsByCategory, answersById);
         gameBoard.displayBoard();
@@ -63,7 +65,6 @@ public class Main {
         gameBoard.selectCell(0, 4);
 
          */
-
     }
 
     private static Map<String, ArrayList<Answer>> getAnswers() {
@@ -95,6 +96,4 @@ public class Main {
         });
         return questionsByCategory;
     }
-
-
 }
