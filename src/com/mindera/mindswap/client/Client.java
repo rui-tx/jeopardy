@@ -6,6 +6,9 @@ import java.net.Socket;
 public class Client {
 
     private boolean locked = false;
+    private long startTime;
+    private long stopTime;
+    private long messageTime;
 
     public static void main(String[] args) {
         Client client = new Client();
@@ -35,6 +38,7 @@ public class Client {
             if (line.equals("/unlock")) {
                 locked = false;
                 System.out.println("You are now unlocked.");
+                startTime = System.currentTimeMillis();
                 continue;
             }
 
@@ -66,9 +70,14 @@ public class Client {
                         continue;
                     }
 
+                    stopTime = System.currentTimeMillis();
+                    messageTime = stopTime - startTime;
+                    line = line + ";" + messageTime;
+
                     out.write(line);
                     out.newLine();
                     out.flush();
+
 
                     if (line.equals("/quit")) {
                         socket.close();

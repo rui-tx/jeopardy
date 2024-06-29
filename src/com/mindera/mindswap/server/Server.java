@@ -13,7 +13,7 @@ import java.util.concurrent.Executors;
 
 public class Server {
 
-    private final int MAX_CLIENTS = 3;
+    private final int MAX_CLIENTS = 2;
 
     private final List<ClientConnectionHandler> clients;
     private ServerSocket serverSocket;
@@ -73,7 +73,7 @@ public class Server {
             return;
         }
 
-        ClientConnectionHandler clientConnectionHandler = new ClientConnectionHandler(clientSocket, "client" + clients.size());
+        ClientConnectionHandler clientConnectionHandler = new ClientConnectionHandler(clientSocket, "");
         threads.submit(clientConnectionHandler);
     }
 
@@ -104,7 +104,7 @@ public class Server {
             handler.send("It's your turn!");
 
             String answer = handler.getAnswer();
-            System.out.println(answer);
+            System.out.println("Answer from " + handler.getName() + ": " + answer);
 
             handler.send("/lock");
         }
@@ -117,6 +117,7 @@ public class Server {
         private final Scanner in;
         private String name;
         private String message;
+        private long messageTime;
         private boolean gameTurn;
 
         public ClientConnectionHandler(Socket clientSocket, String name) throws IOException {
@@ -138,28 +139,34 @@ public class Server {
         }
 
         public synchronized String getAnswer() {
+            String encodedMessage = "";
             String newMessage = "";
+            String messageTime = "";
+
             try {
                 System.out.println("Waiting for answer...");
-                newMessage = in.nextLine();
-                System.out.println("Answer received: " + newMessage);
+
+                encodedMessage = in.nextLine();
+                newMessage = encodedMessage.split(";")[0];
+                messageTime = encodedMessage.split(";")[1];
+                System.out.println("Answer received: " + newMessage + " at " + messageTime + "ms");
 
             } catch (NullPointerException e) {
                 System.out.println(e.getMessage());
                 removeClient(this);
             }
 
-            if (newMessage == null) {
+            if (encodedMessage == null) {
                 System.out.println("Client disconnected");
                 removeClient(this);
             }
             this.message = newMessage;
+            this.messageTime = Long.parseLong(messageTime);
             return this.message;
-
         }
 
         public void changeName() {
-            while (!name.matches("[a-zA-Z]+")) {
+            while (!name.matches("[a-zA-Z0-9]+")) {
                 try {
                     out.write("Please enter a your name:");
                     out.newLine();
