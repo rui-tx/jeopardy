@@ -92,22 +92,33 @@ public class Server {
         clients.forEach(handler -> handler.send("Game started!"));
         this.gameStarted = true;
 
+        String winner = "";
         while (true) {
-            gameTurn();
+            winner = gameTurn();
+            broadcast("[server] Round winner: ", winner + " !");
         }
 
     }
 
-    private void gameTurn() {
+    private String gameTurn() {
+        String winner = "";
+        long lowestTime = 1000000;
+
         for (ClientConnectionHandler handler : clients) {
             handler.send("/unlock");
             handler.send("It's your turn!");
 
             String answer = handler.getAnswer();
             System.out.println("Answer from " + handler.getName() + ": " + answer);
+            if (handler.getMessageTime() < lowestTime) {
+                lowestTime = handler.getMessageTime();
+                winner = handler.getName();
+            }
 
             handler.send("/lock");
         }
+
+        return winner;
     }
 
     public class ClientConnectionHandler implements Runnable {
@@ -224,6 +235,10 @@ public class Server {
 
         public String getName() {
             return name;
+        }
+
+        public long getMessageTime() {
+            return messageTime;
         }
     }
 }
