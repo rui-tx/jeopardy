@@ -1,0 +1,80 @@
+1,Gold,FALSE
+1,Oxygen,TRUE
+1,Osmium,FALSE
+1,Ozone,FALSE
+2,Respiration,FALSE
+2,Photosynthesis,TRUE
+2,Transpiration,FALSE
+2,Fermentation,FALSE
+3,Venus,FALSE
+3,Mars,TRUE
+3,Jupiter,FALSE
+3,Saturn,FALSE
+4,Nucleus,FALSE
+4,Ribosome,FALSE
+4,Mitochondria,TRUE
+4,Chloroplast,FALSE
+5,Tornadoes,FALSE
+5,Hurricanes,FALSE
+5,Earthquakes,TRUE
+5,Tsunamis,FALSE
+6,Thomas Jefferson,FALSE
+6,Abraham Lincoln,FALSE
+6,George Washington,TRUE
+6,John Adams,FALSE
+7,Revolutionary War,FALSE
+7,Civil War,TRUE
+7,World War I,FALSE
+7,War of 1812,FALSE
+8,Magna Carta,TRUE
+8,Constitution,FALSE
+8,Bill of Rights,FALSE
+8,Declaration of Independence,FALSE
+9,Nagasaki,FALSE
+9,Tokyo,FALSE
+9,Berlin,FALSE
+9,Hiroshima,TRUE
+10,France,FALSE
+10,Spain,FALSE
+10,Italy,TRUE
+10,England,FALSE
+11,J.K. Rowling,FALSE
+11,George Orwell,TRUE
+11,Ernest Hemingway,FALSE
+11,Mark Twain,FALSE
+12,"""The Great Gatsby""",FALSE
+12,"""1984""",FALSE
+12,"""To Kill a Mockingbird""",TRUE
+12,"""Pride and Prejudice""",FALSE
+13,Charles Dickens,FALSE
+13,William Shakespeare,TRUE
+13,Arthur Miller,FALSE
+13,Tennessee Williams,FALSE
+14,Shark,FALSE
+14,Whale,TRUE
+14,Dolphin,FALSE
+14,Octopus,FALSE
+15,"""The Chronicles of Narnia""",FALSE
+15,"""The Hunger Games""",FALSE
+15,"""Percy Jackson""",FALSE
+15,"""Harry Potter""",TRUE
+16,The Rolling Stones,FALSE
+16,The Beatles,TRUE
+16,Pink Floyd,FALSE
+16,The Who,FALSE
+17,"""Nomadland""",TRUE
+17,"""Mank""",FALSE
+17,"""Minari""",FALSE
+17,"""The Father""",FALSE
+18,"""The Witcher""",FALSE
+18,"""Breaking Bad""",FALSE
+18,"""Game of Thrones""",TRUE
+18,"""Stranger Things""",FALSE
+19,Bruno Mars,FALSE
+19,Ed Sheeran,TRUE
+19,Justin Bieber,FALSE
+19,Shawn Mendes,FALSE
+20,"""Final Fantasy""",FALSE
+20,"""The Legend of Zelda""",TRUE
+20,"""Super Mario""",FALSE
+20,"""Metroid""",FALSE
