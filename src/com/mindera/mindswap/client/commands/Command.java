@@ -4,6 +4,7 @@ public enum Command {
     LOCK("/lock", new LockHandler()),
     UNLOCK("/unlock", new UnlockHandler()),
     QUIT("/quit", new QuitHandler()),
+    TEST("/test", new TestHandler()),
 
     NOT_FOUND("Command not found", new CommandNotFoundHandler());
 

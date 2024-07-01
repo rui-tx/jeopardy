@@ -153,6 +153,12 @@ public class Client {
                 try {
                     String input = in.readLine();
 
+                    // just testing ascii art
+                    if (input.equals(Command.TEST.getDescription())) {
+                        runCommand(Command.TEST.getDescription());
+                        continue;
+                    }
+
                     // If the user types "/quit", quit the application
                     // TODO: Something feels wrong here...
                     if (input.equals(Command.QUIT.getDescription())) {
