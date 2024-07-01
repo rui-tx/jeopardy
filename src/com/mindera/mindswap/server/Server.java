@@ -1,5 +1,8 @@
 package com.mindera.mindswap.server;
 
+import com.mindera.mindswap.Game;
+import com.mindera.mindswap.board.Board;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -13,19 +16,25 @@ import java.util.concurrent.Executors;
 
 public class Server {
 
-    private final int MAX_CLIENTS = 3;
+    private final int MAX_CLIENTS = 1;
 
     private final List<ClientConnectionHandler> clients;
     private ServerSocket serverSocket;
     private int port;
     private ExecutorService threads;
     private boolean gameStarted;
+    // Additions
+    private Board board;
+    private Game game;
 
 
     public Server(int port) {
         clients = new CopyOnWriteArrayList<>();
         this.port = port;
         this.gameStarted = false;
+        // Additions
+        board = new Board();
+        game = new Game(board);
     }
 
     public void start() {
@@ -94,8 +103,8 @@ public class Server {
 
         while (true) {
             gameTurn();
-        }
 
+        }
     }
 
     private void gameTurn() {
@@ -103,6 +112,10 @@ public class Server {
             handler.send("/unlock");
             handler.send("It's your turn!");
 
+
+            handler.send(String.valueOf(board.displayBoard()));
+
+            
             String answer = handler.getAnswer();
             System.out.println(answer);
 
@@ -155,7 +168,6 @@ public class Server {
             }
             this.message = newMessage;
             return this.message;
-
         }
 
         public void changeName() {
