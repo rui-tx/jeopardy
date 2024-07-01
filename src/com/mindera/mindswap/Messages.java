@@ -22,8 +22,8 @@ public enum Messages {
     CONNECTION_LOST("Connection lost"),
 
     //Error messages
-    ERROR("Error"),
-    ;
+    ERROR("Something went wrong"),
+    COMMAND_NOT_FOUND("Command not found");
 
     private final String message;
 
