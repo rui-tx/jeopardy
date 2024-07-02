@@ -16,7 +16,7 @@ import java.util.concurrent.Executors;
 
 public class Server {
 
-    private final int MAX_CLIENTS = 1;
+    private final int MAX_CLIENTS = 2;
     private final List<ClientConnectionHandler> clients;
     private ServerSocket serverSocket;
     private int port;
@@ -102,33 +102,65 @@ public class Server {
 
         String winner = "";
         while (true) {
+            ClientConnectionHandler handler = selectPlayer();
+            getQuestionNumber(handler);
+
             winner = gameTurn();
             broadcast("[server] Round winner: ", winner + " !");
+
         }
     }
+
+    private ClientConnectionHandler selectPlayer() {
+        for (ClientConnectionHandler handler : clients) {
+            if (!handler.hasPlayed) {
+                handler.hasPlayed = true;
+                return handler;
+            }
+        }
+
+        // no player has played yet, reset and return the first player
+        return resetAndGetPlayer();
+    }
+
+    private ClientConnectionHandler resetAndGetPlayer() {
+        clients.forEach(c -> c.hasPlayed = false);
+        return clients.getFirst();
+    }
+
+    private void getQuestionNumber(ClientConnectionHandler handler) {
+        handler.send("/unlock");
+        // Display the board and let the client select a question
+        handler.send(String.valueOf(board.displayBoard()));
+        handler.send("Select a question number (1-16):");
+        handler.send("/state question");
+        int questionNumber = Integer.parseInt(handler.getAnswer());
+
+        // set question number for all players
+        clients.forEach(c -> c.setQuestionNumber(questionNumber));
+
+        handler.send("/lock");
+        handler.send("/state idle");
+    }
+
 
     private String gameTurn() {
         String winner = "";
         long lowestTime = 1000000;
 
+        clients.forEach(c -> c.send("Wait for other players to answer..."));
+
         for (ClientConnectionHandler handler : clients) {
             handler.send("/unlock");
-            handler.send("It's your turn!");
+            handler.send("Answer your question!");
 
-            //System.out.println("Answer from " + handler.getName() + ": " + answer);
             if (handler.getMessageTime() < lowestTime) {
                 lowestTime = handler.getMessageTime();
                 winner = handler.getName();
             }
 
-            // Display the board and let the client select a question
-            handler.send(String.valueOf(board.displayBoard()));
-            handler.send("Select a question number (1-16):");
-            handler.send("/state question");
-            int questionNumber = Integer.parseInt(handler.getAnswer());
-
             // Send the selected question to the client
-            String questionResponse = board.selectQuestion(questionNumber);
+            String questionResponse = board.selectQuestion(handler.getQuestionNumber());
             handler.send(questionResponse);
 
             // Receive the answer from the client
@@ -137,11 +169,8 @@ public class Server {
             int selectedAnswer = Integer.parseInt(handler.getAnswer());
 
             // Check the answer and send the result to the client
-            String answerResponse = board.checkAnswer(questionNumber, selectedAnswer);
+            String answerResponse = board.checkAnswer(handler.getQuestionNumber(), selectedAnswer);
             handler.send(answerResponse);
-
-            //String answer = handler.getAnswer();
-            //System.out.println(answer);
 
             handler.send("/lock");
         }
@@ -158,6 +187,8 @@ public class Server {
         private String message;
         private long messageTime;
         private boolean gameTurn;
+        private boolean hasPlayed;
+        private int questionNumber;
 
         public ClientConnectionHandler(Socket clientSocket, String name) throws IOException {
             this.clientSocket = clientSocket;
@@ -165,6 +196,7 @@ public class Server {
             this.out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
             this.in = new Scanner(clientSocket.getInputStream());
             this.gameTurn = false;
+            this.hasPlayed = false;
         }
 
         @Override
@@ -267,6 +299,14 @@ public class Server {
 
         public long getMessageTime() {
             return messageTime;
+        }
+
+        public int getQuestionNumber() {
+            return questionNumber;
+        }
+
+        public void setQuestionNumber(int questionNumber) {
+            this.questionNumber = questionNumber;
         }
     }
 }
