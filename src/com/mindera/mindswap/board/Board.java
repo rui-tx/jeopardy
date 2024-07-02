@@ -1,51 +1,61 @@
 package com.mindera.mindswap.board;
 
+import com.mindera.mindswap.utils.CSVReader;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.stream.IntStream;
 
-public class Board {
-    private static final int BOARD_SIZE = 4;
-    private final Cell[][] gameBoard;
-    private final Scanner scanner;
+import static com.mindera.mindswap.Constants.*;
 
-    public Board(Map<String, ArrayList<Question>> questionsByCategory, Map<String, ArrayList<Answer>> answersById) {
+
+public class Board {
+    private final Cell[][] gameBoard;
+    private final Map<String, ArrayList<Question>> questionsByCategory;
+    private final Map<String, ArrayList<Answer>> answersById;
+    private final StringBuilder sb;
+
+    public Board() {
         gameBoard = new Cell[BOARD_SIZE][BOARD_SIZE];
-        scanner = new Scanner(System.in);
+        sb = new StringBuilder();
+        questionsByCategory = getQuestions();
+        answersById = getAnswers();
         populateBoardWithQuestionsAndAnswers(questionsByCategory, answersById);
     }
 
 
-    private void checkAnswer(Cell cell, int selectedAnswer) {
-        if (selectedAnswer > 0 && selectedAnswer <= cell.answers.size()) {
-            Answer answer = cell.answers.get(selectedAnswer - 1);
-            if (answer.isCorrect) {
-                System.out.println("Correct answer!");
-            } else {
-                System.out.println("Incorrect answer.");
-            }
+    public String checkAnswer(int questionNumber, int selectedAnswer) {
+        Cell cell = getCellByQuestionNumber(questionNumber);
+
+        if (selectedAnswer <= 0 || selectedAnswer > cell.answers.size()) {
+            return "Invalid answer selection. Please select a valid answer (1-4): ";
+        }
+        Answer answer = cell.answers.get(selectedAnswer - 1);
+        if (answer.isCorrect) {
+            return "Correct answer!";
         } else {
-            System.out.println("Invalid answer selection.");
+            return "Incorrect answer.";
         }
     }
 
-    public void selectQuestion(int questionNumber) {
-        Cell cell = getCellByQuestionNumber(questionNumber);
-        if (cell != null) {
-            System.out.println("Question: " + cell.question.questionText);
-            int optionNumber = 1;
-            for (Answer answer : cell.answers) {
-                System.out.println(optionNumber + ": " + answer.answerText);
-                optionNumber++;
-            }
-            System.out.print("Select an answer (1-4): ");
-            int selectedAnswer = scanner.nextInt();
-            checkAnswer(cell, selectedAnswer);
-        } else {
-            System.out.println("Invalid question number selected.");
+    private StringBuilder promptQuestionAndAnswers(Cell cell) {
+        sb.append("Question: ").append(cell.question.questionText).append(System.lineSeparator());
+
+        int optionNumber = 1;
+        for (Answer answer : cell.answers) {
+            sb.append(optionNumber).append(": ").append(answer.answerText).append(System.lineSeparator());
+            optionNumber++;
         }
+        return sb;
+    }
+
+    public String selectQuestion(int questionNumber) {
+        Cell cell = getCellByQuestionNumber(questionNumber);
+        if (cell == null) {
+            return "Invalid question selection.";
+        }
+        return String.valueOf(promptQuestionAndAnswers(cell));
     }
 
     public Cell getCellByQuestionNumber(int questionNumber) {
@@ -63,19 +73,17 @@ public class Board {
         return null;
     }
 
-    public void displayBoard() {
+    public StringBuilder displayBoard() {
         int counter = 1;
         for (int row = 0; row < BOARD_SIZE; row++) {
             for (int col = 0; col < BOARD_SIZE; col++) {
                 if (gameBoard[row][col] != null) {
-                    System.out.println("Question " + counter++ + " ");
-                }
-                else {
-                    System.out.println("        ");
+                    sb.append("Question ").append(counter).append(" ");
+                    counter++;
                 }
             }
-            System.out.println();
         }
+        return sb;
     }
 
     private void populateBoardWithQuestionsAndAnswers(Map<String, ArrayList<Question>> questionsByCategory, Map<String, ArrayList<Answer>> answersById) {
@@ -97,5 +105,23 @@ public class Board {
                 });
             }
         });
+    }
+
+    private Map<String, ArrayList<Answer>> getAnswers() {
+        return CSVReader.readItems(ANSWERS_FILE_PATH, columns -> {
+            String id = columns[0];
+            String answerText = columns[1];
+            boolean isCorrect = Boolean.parseBoolean(columns[2]);
+            return new Answer(id, answerText, isCorrect);
+        }, 0);
+    }
+
+    private Map<String, ArrayList<Question>> getQuestions() {
+        return CSVReader.readItems(QUESTIONS_FILE_PATH, columns -> {
+            String id = columns[0];
+            String category = columns[1];
+            String questionText = columns[2];
+            return new Question(id, category, questionText);
+        }, 1);
     }
 }

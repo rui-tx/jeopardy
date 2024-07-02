@@ -14,7 +14,6 @@ public class Client {
         } catch (IOException e) {
             System.out.println("Connection closed...");
         }
-
     }
 
     private void start(String host, int port) throws IOException {
@@ -87,4 +86,3 @@ public class Client {
         }
     }
 }
-

@@ -1,5 +1,8 @@
 package com.mindera.mindswap.server;
 
+import com.mindera.mindswap.Game;
+import com.mindera.mindswap.board.Board;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -13,19 +16,25 @@ import java.util.concurrent.Executors;
 
 public class Server {
 
-    private final int MAX_CLIENTS = 3;
+    private final int MAX_CLIENTS = 1;
 
     private final List<ClientConnectionHandler> clients;
     private ServerSocket serverSocket;
     private int port;
     private ExecutorService threads;
     private boolean gameStarted;
+    // Additions
+    private Board board;
+    private Game game;
 
 
     public Server(int port) {
         clients = new CopyOnWriteArrayList<>();
         this.port = port;
         this.gameStarted = false;
+        // Additions
+        board = new Board();
+        game = new Game(board);
     }
 
     public void start() {
@@ -94,8 +103,8 @@ public class Server {
 
         while (true) {
             gameTurn();
-        }
 
+        }
     }
 
     private void gameTurn() {
@@ -103,8 +112,25 @@ public class Server {
             handler.send("/unlock");
             handler.send("It's your turn!");
 
-            String answer = handler.getAnswer();
-            System.out.println(answer);
+            // Display the board and let the client select a question
+            handler.send(String.valueOf(board.displayBoard()));
+            handler.send("Select a question number (1-16):");
+            int questionNumber = Integer.parseInt(handler.getAnswer());
+
+            // Send the selected question to the client
+            String questionResponse = board.selectQuestion(questionNumber);
+            handler.send(questionResponse);
+
+            // Receive the answer from the client
+            handler.send("Select an answer (1-4):");
+            int selectedAnswer = Integer.parseInt(handler.getAnswer());
+
+            // Check the answer and send the result to the client
+            String answerResponse = board.checkAnswer(questionNumber, selectedAnswer);
+            handler.send(answerResponse);
+
+            //String answer = handler.getAnswer();
+            //System.out.println(answer);
 
             handler.send("/lock");
         }
@@ -155,7 +181,6 @@ public class Server {
             }
             this.message = newMessage;
             return this.message;
-
         }
 
         public void changeName() {
