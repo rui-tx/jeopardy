@@ -16,8 +16,7 @@ import java.util.concurrent.Executors;
 
 public class Server {
 
-    private final int MAX_CLIENTS = 1;
-
+    private final int MAX_CLIENTS = 2;
     private final List<ClientConnectionHandler> clients;
     private ServerSocket serverSocket;
     private int port;
@@ -82,7 +81,7 @@ public class Server {
             return;
         }
 
-        ClientConnectionHandler clientConnectionHandler = new ClientConnectionHandler(clientSocket, "client" + clients.size());
+        ClientConnectionHandler clientConnectionHandler = new ClientConnectionHandler(clientSocket, "");
         threads.submit(clientConnectionHandler);
     }
 
@@ -101,16 +100,26 @@ public class Server {
         clients.forEach(handler -> handler.send("Game started!"));
         this.gameStarted = true;
 
+        String winner = "";
         while (true) {
-            gameTurn();
-
+            winner = gameTurn();
+            broadcast("[server] Round winner: ", winner + " !");
         }
     }
 
-    private void gameTurn() {
+    private String gameTurn() {
+        String winner = "";
+        long lowestTime = 1000000;
+
         for (ClientConnectionHandler handler : clients) {
             handler.send("/unlock");
             handler.send("It's your turn!");
+
+            System.out.println("Answer from " + handler.getName() + ": " + answer);
+            if (handler.getMessageTime() < lowestTime) {
+                lowestTime = handler.getMessageTime();
+                winner = handler.getName();
+            }
 
             // Display the board and let the client select a question
             handler.send(String.valueOf(board.displayBoard()));
@@ -134,6 +143,8 @@ public class Server {
 
             handler.send("/lock");
         }
+
+        return winner;
     }
 
     public class ClientConnectionHandler implements Runnable {
@@ -143,6 +154,7 @@ public class Server {
         private final Scanner in;
         private String name;
         private String message;
+        private long messageTime;
         private boolean gameTurn;
 
         public ClientConnectionHandler(Socket clientSocket, String name) throws IOException {
@@ -164,27 +176,34 @@ public class Server {
         }
 
         public synchronized String getAnswer() {
+            String encodedMessage = "";
             String newMessage = "";
+            String messageTime = "";
+
             try {
                 System.out.println("Waiting for answer...");
-                newMessage = in.nextLine();
-                System.out.println("Answer received: " + newMessage);
+
+                encodedMessage = in.nextLine();
+                newMessage = encodedMessage.split(";")[0];
+                messageTime = encodedMessage.split(";")[1];
+                System.out.println("Answer received: " + newMessage + " at " + messageTime + "ms");
 
             } catch (NullPointerException e) {
                 System.out.println(e.getMessage());
                 removeClient(this);
             }
 
-            if (newMessage == null) {
+            if (encodedMessage == null) {
                 System.out.println("Client disconnected");
                 removeClient(this);
             }
             this.message = newMessage;
+            this.messageTime = Long.parseLong(messageTime);
             return this.message;
         }
 
         public void changeName() {
-            while (!name.matches("[a-zA-Z]+")) {
+            while (!name.matches("[a-zA-Z0-9]+")) {
                 try {
                     out.write("Please enter a your name:");
                     out.newLine();
@@ -242,6 +261,10 @@ public class Server {
 
         public String getName() {
             return name;
+        }
+
+        public long getMessageTime() {
+            return messageTime;
         }
     }
 }
