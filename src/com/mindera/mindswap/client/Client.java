@@ -13,6 +13,8 @@ public class Client {
     private long startTime;
     private long stopTime;
     private long messageTime;
+    private ClientState state;
+    private String[] lastCommand;
 
     /**
      * Main method to start the client application.
@@ -41,6 +43,8 @@ public class Client {
         BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         BufferedWriter out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
         locked = false;
+        state = ClientState.IDLE;
+        lastCommand = new String[2];
 
         new Thread(new KeyboardHandler(out, socket)).start();
         String receivedMessage;
@@ -78,6 +82,11 @@ public class Client {
         // Example: "/help" -> "help", ""
         String description = serverCommand.split(" ")[0];
         Command command = Command.getCommandFromDescription(description);
+        lastCommand[0] = description;
+
+        if (serverCommand.split(" ").length == 2)
+            lastCommand[1] = serverCommand.split(" ")[1];
+        else lastCommand[1] = null;
 
         command.getHandler().execute(this);
     }
@@ -124,6 +133,19 @@ public class Client {
     }
 
     /**
+     * Set client state
+     *
+     * @param clientState
+     */
+    public void setState(ClientState clientState) {
+        this.state = clientState;
+    }
+
+    public String[] getLastCommand() {
+        return lastCommand;
+    }
+
+    /**
      * Handles keyboard input from the user and sends it to the server.
      */
     private class KeyboardHandler implements Runnable {
@@ -151,7 +173,9 @@ public class Client {
 
             while (!socket.isClosed()) {
                 try {
+
                     String input = in.readLine();
+
 
                     // just testing ascii art
                     if (input.equals(Command.TEST.getDescription())) {
@@ -169,6 +193,22 @@ public class Client {
                     if (locked) {
                         Messages.printMessage(Messages.LOCKED_OUT);
                         continue;
+                    }
+
+                    if (state == ClientState.QUESTIONING) {
+                        String regex = "^(1[0-6]|[1-9])$";
+                        if(!input.matches(regex)) {
+                            Messages.printMessage(Messages.BAD_QUESTION);
+                            continue;
+                        }
+                    }
+
+                    if (state == ClientState.ANSWERING) {
+                        String regex = "^([1-4])$";
+                        if(!input.matches(regex)) {
+                            Messages.printMessage(Messages.BAD_ANSWER);
+                            continue;
+                        }
                     }
 
                     // Ignore empty input

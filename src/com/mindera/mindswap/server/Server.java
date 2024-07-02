@@ -124,6 +124,7 @@ public class Server {
             // Display the board and let the client select a question
             handler.send(String.valueOf(board.displayBoard()));
             handler.send("Select a question number (1-16):");
+            handler.send("/state question");
             int questionNumber = Integer.parseInt(handler.getAnswer());
 
             // Send the selected question to the client
@@ -132,6 +133,7 @@ public class Server {
 
             // Receive the answer from the client
             handler.send("Select an answer (1-4):");
+            handler.send("/state answer");
             int selectedAnswer = Integer.parseInt(handler.getAnswer());
 
             // Check the answer and send the result to the client

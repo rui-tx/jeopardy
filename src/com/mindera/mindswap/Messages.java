@@ -8,6 +8,8 @@ public enum Messages {
     CLIENT_MESSAGE("Client message"),
     LOCKED_OUT("You are locked out!"),
     UNLOCKED("You are now unlocked."),
+    BAD_QUESTION("That is not a valid question number."),
+    BAD_ANSWER("That is not a valid answer number."),
 
     //Server messages
     SERVER_CONNECTED("Server connected"),
