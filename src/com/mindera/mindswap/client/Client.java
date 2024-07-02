@@ -189,6 +189,7 @@ public class Client {
             }
         }
 
+
         /**
          * Sends a message to the server after encoding it.
          *
@@ -221,3 +222,4 @@ public class Client {
         }
     }
 }
+
