@@ -115,7 +115,7 @@ public class Server {
             handler.send("/unlock");
             handler.send("It's your turn!");
 
-            System.out.println("Answer from " + handler.getName() + ": " + answer);
+            //System.out.println("Answer from " + handler.getName() + ": " + answer);
             if (handler.getMessageTime() < lowestTime) {
                 lowestTime = handler.getMessageTime();
                 winner = handler.getName();
