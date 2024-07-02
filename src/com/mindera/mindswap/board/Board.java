@@ -54,7 +54,7 @@ public class Board {
     public String selectQuestion(int questionNumber) {
         Cell cell = getCellByQuestionNumber(questionNumber);
         if (cell == null) {
-            return ANSI_YELLOW + "Invalid question selection. Please select a valid answer (1-16): " + ANSI_RESET + System.lineSeparator();
+            return ANSI_YELLOW + "Invalid question selection. That question already been answered, choose another " + ANSI_RESET + System.lineSeparator();
         }
         return String.valueOf(promptQuestionAndAnswers(cell));
     }
