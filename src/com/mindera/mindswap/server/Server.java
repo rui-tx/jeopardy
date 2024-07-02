@@ -16,7 +16,7 @@ import java.util.concurrent.Executors;
 
 public class Server {
 
-    private final int MAX_CLIENTS = 2;
+    private final int MAX_CLIENTS = 1;
     private final List<ClientConnectionHandler> clients;
     private ServerSocket serverSocket;
     private int port;

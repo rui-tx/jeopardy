@@ -27,6 +27,7 @@ public enum Messages {
     ERROR("Something went wrong"),
     COMMAND_NOT_FOUND("Command not found");
 
+
     private final String message;
 
     Messages(String message) {

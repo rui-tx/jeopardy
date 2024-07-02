@@ -8,17 +8,16 @@ import java.util.Map;
 import java.util.stream.IntStream;
 
 import static com.mindera.mindswap.Constants.*;
+import static com.mindera.mindswap.utils.TerminalColors.*;
 
 
 public class Board {
     private final Cell[][] gameBoard;
     private final Map<String, ArrayList<Question>> questionsByCategory;
     private final Map<String, ArrayList<Answer>> answersById;
-    private final StringBuilder sb;
 
     public Board() {
         gameBoard = new Cell[BOARD_SIZE][BOARD_SIZE];
-        sb = new StringBuilder();
         questionsByCategory = getQuestions();
         answersById = getAnswers();
         populateBoardWithQuestionsAndAnswers(questionsByCategory, answersById);
@@ -29,17 +28,19 @@ public class Board {
         Cell cell = getCellByQuestionNumber(questionNumber);
 
         if (selectedAnswer <= 0 || selectedAnswer > cell.answers.size()) {
-            return "Invalid answer selection. Please select a valid answer (1-4): ";
+            return ANSI_YELLOW + "Invalid answer selection. Please select a valid answer (1-4): " + ANSI_RESET + System.lineSeparator();
         }
         Answer answer = cell.answers.get(selectedAnswer - 1);
         if (answer.isCorrect) {
-            return "Correct answer!";
+            return ANSI_GREEN + "Correct answer!" + ANSI_RESET + System.lineSeparator();
         } else {
-            return "Incorrect answer.";
+            return ANSI_RED + "Incorrect answer." + ANSI_RESET + System.lineSeparator();
         }
     }
 
     private StringBuilder promptQuestionAndAnswers(Cell cell) {
+        StringBuilder sb = new StringBuilder();
+
         sb.append("Question: ").append(cell.question.questionText).append(System.lineSeparator());
 
         int optionNumber = 1;
@@ -53,7 +54,7 @@ public class Board {
     public String selectQuestion(int questionNumber) {
         Cell cell = getCellByQuestionNumber(questionNumber);
         if (cell == null) {
-            return "Invalid question selection.";
+            return ANSI_YELLOW + "Invalid question selection. Please select a valid answer (1-16): " + ANSI_RESET + System.lineSeparator();
         }
         return String.valueOf(promptQuestionAndAnswers(cell));
     }
@@ -74,6 +75,7 @@ public class Board {
     }
 
     public StringBuilder displayBoard() {
+        StringBuilder sb = new StringBuilder();
         int counter = 1;
         for (int row = 0; row < BOARD_SIZE; row++) {
             for (int col = 0; col < BOARD_SIZE; col++) {
