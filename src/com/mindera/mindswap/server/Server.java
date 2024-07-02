@@ -112,12 +112,25 @@ public class Server {
             handler.send("/unlock");
             handler.send("It's your turn!");
 
-
+            // Display the board and let the client select a question
             handler.send(String.valueOf(board.displayBoard()));
+            handler.send("Select a question number (1-16):");
+            int questionNumber = Integer.parseInt(handler.getAnswer());
 
-            
-            String answer = handler.getAnswer();
-            System.out.println(answer);
+            // Send the selected question to the client
+            String questionResponse = board.selectQuestion(questionNumber);
+            handler.send(questionResponse);
+
+            // Receive the answer from the client
+            handler.send("Select an answer (1-4):");
+            int selectedAnswer = Integer.parseInt(handler.getAnswer());
+
+            // Check the answer and send the result to the client
+            String answerResponse = board.checkAnswer(questionNumber, selectedAnswer);
+            handler.send(answerResponse);
+
+            //String answer = handler.getAnswer();
+            //System.out.println(answer);
 
             handler.send("/lock");
         }
