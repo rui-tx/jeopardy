@@ -123,9 +123,20 @@ public class Server {
 
             // Display the board and let the client select a question
             handler.send(String.valueOf(board.displayBoard()));
-            handler.send("Select a question number (1-16):");
+            handler.send("Select a question (1-16):");
             handler.send("/state question");
-            int questionNumber = Integer.parseInt(handler.getAnswer());
+
+            int questionNumber = -1;
+            while (true) {
+                try {
+                    questionNumber = Integer.parseInt(handler.getAnswer());
+                    if (questionNumber >= 1 && questionNumber <= 16) {
+                        break; // valid input, exit loop todo: deal with null cell selection
+                    }
+                } catch (NumberFormatException e) {
+                    throw new RuntimeException(e);
+                }
+            }
 
             // Send the selected question to the client
             String questionResponse = board.selectQuestion(questionNumber);
@@ -134,14 +145,22 @@ public class Server {
             // Receive the answer from the client
             handler.send("Select an answer (1-4):");
             handler.send("/state answer");
-            int selectedAnswer = Integer.parseInt(handler.getAnswer());
+
+            int selectedAnswer = -1;
+            while (true) {
+                try {
+                    selectedAnswer = Integer.parseInt(handler.getAnswer());
+                    if (selectedAnswer >= 1 && selectedAnswer <= 4) {
+                        break; // valid input, exit loop
+                    }
+                } catch (NumberFormatException e) {
+                    throw new RuntimeException(e);
+                }
+            }
 
             // Check the answer and send the result to the client
             String answerResponse = board.checkAnswer(questionNumber, selectedAnswer);
             handler.send(answerResponse);
-
-            //String answer = handler.getAnswer();
-            //System.out.println(answer);
 
             handler.send("/lock");
         }

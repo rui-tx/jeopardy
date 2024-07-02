@@ -1,5 +1,8 @@
 package com.mindera.mindswap;
 
+import static com.mindera.mindswap.utils.TerminalColors.ANSI_RESET;
+import static com.mindera.mindswap.utils.TerminalColors.ANSI_YELLOW;
+
 public enum Messages {
 
     //Client messages
@@ -8,8 +11,10 @@ public enum Messages {
     CLIENT_MESSAGE("Client message"),
     LOCKED_OUT("You are locked out!"),
     UNLOCKED("You are now unlocked."),
-    BAD_QUESTION("That is not a valid question number."),
-    BAD_ANSWER("That is not a valid answer number."),
+    BAD_QUESTION(ANSI_YELLOW + "That is not a valid question number." + ANSI_RESET + System.lineSeparator()),
+    BAD_ANSWER(ANSI_YELLOW + "That is not a valid answer number." + ANSI_RESET + System.lineSeparator()),
+    SELECT_QUESTION("Select a question (1-16):"),
+    SELECT_ANSWER("Select an answer (1-4):"),
 
     //Server messages
     SERVER_CONNECTED("Server connected"),
