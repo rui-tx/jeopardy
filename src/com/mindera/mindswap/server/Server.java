@@ -16,7 +16,7 @@ import java.util.concurrent.Executors;
 
 public class Server {
 
-    private final int MAX_CLIENTS = 2;
+    private final int MAX_CLIENTS = 1;
     private final List<ClientConnectionHandler> clients;
     private ServerSocket serverSocket;
     private int port;
@@ -131,7 +131,7 @@ public class Server {
     private void getQuestionNumber(ClientConnectionHandler handler) {
         handler.send("/unlock");
         // Display the board and let the client select a question
-        handler.send(String.valueOf(board.displayBoard()));
+        handler.send(board.displayPrettyBoard());
         handler.send("Select a question number (1-16):");
         handler.send("/state question");
         int questionNumber = Integer.parseInt(handler.getAnswer());
