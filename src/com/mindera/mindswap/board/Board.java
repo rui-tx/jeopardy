@@ -87,6 +87,33 @@ public class Board {
         return String.valueOf(sb);
     }
 
+    public String displayPrettyBoard() {
+        StringBuilder prettyBoard = new StringBuilder();
+        int testQuestionAmount = 100;
+        int counter = 1;
+
+        // Add top border
+        //prettyBoard.append(" _______________________________________________________________ \n");
+        prettyBoard.append("\n");
+        prettyBoard.append(" =================================================================================== \n");
+        //prettyBoard.append("| CAT1               | CAT2               | CAT3               | CAT4               |\n");
+        for (int row = 0; row < BOARD_SIZE; row++) {
+            for (int col = 0; col < BOARD_SIZE; col++) {
+                if (gameBoard[row][col] != null) {
+                    String format = "| Question " + ANSI_GREEN + "%-2d" + ANSI_RESET + " - %3d$ ";
+                    prettyBoard.append(String.format(format, counter, testQuestionAmount));
+                    counter++;
+                } else {
+                    prettyBoard.append("|     --------       ");
+                }
+            }
+            prettyBoard.append("|\n");
+        }
+
+        prettyBoard.append(" =================================================================================== \n");
+        return prettyBoard.toString();
+    }
+
     private void populateBoardWithQuestionsAndAnswers(Map<String, ArrayList<Question>> questionsByCategory, Map<String, ArrayList<Answer>> answersById) {
         List<String> categories = new ArrayList<>(questionsByCategory.keySet());
 

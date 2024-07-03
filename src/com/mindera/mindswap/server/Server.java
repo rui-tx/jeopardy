@@ -14,7 +14,7 @@ import java.util.concurrent.Executors;
 
 public class Server {
 
-    private final int MAX_CLIENTS = 2;
+    private final int MAX_CLIENTS = 1;
     private final List<ClientConnectionHandler> clients;
     private ServerSocket serverSocket;
     private int port;
@@ -162,7 +162,7 @@ public class Server {
         currentHandler.send("It's your turn!");
 
         // Display the board and let the current player select a question
-        currentHandler.send(board.displayBoard());
+        currentHandler.send(board.displayPrettyBoard());
         currentHandler.send("Select a question number (1-16):");
         currentHandler.send("/state question");
 
@@ -202,6 +202,7 @@ public class Server {
     private String gameTurn() {
         String winner = "";
         long lowestTime = 1_000_000;
+
 
         // Select the current player to choose the question
         ClientConnectionHandler currentPlayer = selectPlayer();
