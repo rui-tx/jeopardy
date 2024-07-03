@@ -1,80 +1,240 @@
-1,Gold,FALSE
-1,Oxygen,TRUE
-1,Osmium,FALSE
-1,Ozone,FALSE
-2,Respiration,FALSE
-2,Photosynthesis,TRUE
-2,Transpiration,FALSE
-2,Fermentation,FALSE
-3,Venus,FALSE
-3,Mars,TRUE
-3,Jupiter,FALSE
-3,Saturn,FALSE
-4,Nucleus,FALSE
-4,Ribosome,FALSE
-4,Mitochondria,TRUE
-4,Chloroplast,FALSE
-5,Tornadoes,FALSE
-5,Hurricanes,FALSE
-5,Earthquakes,TRUE
-5,Tsunamis,FALSE
-6,Thomas Jefferson,FALSE
-6,Abraham Lincoln,FALSE
-6,George Washington,TRUE
-6,John Adams,FALSE
-7,Revolutionary War,FALSE
-7,Civil War,TRUE
-7,World War I,FALSE
-7,War of 1812,FALSE
-8,Magna Carta,TRUE
-8,Constitution,FALSE
-8,Bill of Rights,FALSE
-8,Declaration of Independence,FALSE
-9,Nagasaki,FALSE
-9,Tokyo,FALSE
-9,Berlin,FALSE
-9,Hiroshima,TRUE
-10,France,FALSE
-10,Spain,FALSE
-10,Italy,TRUE
-10,England,FALSE
-11,J.K. Rowling,FALSE
-11,George Orwell,TRUE
-11,Ernest Hemingway,FALSE
-11,Mark Twain,FALSE
-12,"""The Great Gatsby""",FALSE
-12,"""1984""",FALSE
-12,"""To Kill a Mockingbird""",TRUE
-12,"""Pride and Prejudice""",FALSE
-13,Charles Dickens,FALSE
-13,William Shakespeare,TRUE
-13,Arthur Miller,FALSE
-13,Tennessee Williams,FALSE
-14,Shark,FALSE
-14,Whale,TRUE
-14,Dolphin,FALSE
-14,Octopus,FALSE
-15,"""The Chronicles of Narnia""",FALSE
-15,"""The Hunger Games""",FALSE
-15,"""Percy Jackson""",FALSE
-15,"""Harry Potter""",TRUE
-16,The Rolling Stones,FALSE
-16,The Beatles,TRUE
-16,Pink Floyd,FALSE
-16,The Who,FALSE
-17,"""Nomadland""",TRUE
-17,"""Mank""",FALSE
-17,"""Minari""",FALSE
-17,"""The Father""",FALSE
-18,"""The Witcher""",FALSE
-18,"""Breaking Bad""",FALSE
-18,"""Game of Thrones""",TRUE
-18,"""Stranger Things""",FALSE
-19,Bruno Mars,FALSE
-19,Ed Sheeran,TRUE
-19,Justin Bieber,FALSE
-19,Shawn Mendes,FALSE
-20,"""Final Fantasy""",FALSE
-20,"""The Legend of Zelda""",TRUE
-20,"""Super Mario""",FALSE
-20,"""Metroid""",FALSE
+1/H2O/true
+1/O2/false
+1/CO2/false
+1/H2/false
+2/Mars/true
+2/Earth/false
+2/Jupiter/false
+2/Saturn/false
+3/Mitochondria/true
+3/Nucleus/false
+3/Ribosome/false
+3/Endoplasmic Reticulum/false
+4/Carbon Dioxide/true
+4/Oxygen/false
+4/Nitrogen/false
+4/Hydrogen/false
+5/Nitrogen/true
+5/Oxygen/false
+5/Carbon Dioxide/false
+5/Hydrogen/false
+6/George Washington/true
+6/Abraham Lincoln/false
+6/Thomas Jefferson/false
+6/John Adams/false
+7/1945/true
+7/1939/false
+7/1918/false
+7/1963/false
+8/Christopher Columbus/true
+8/Marco Polo/false
+8/Ferdinand Magellan/false
+8/Leif Erikson/false
+9/Ancient Egyptians/true
+9/Romans/false
+9/Greeks/false
+9/Mayans/false
+10/Winston Churchill/true
+10/Franklin D. Roosevelt/false
+10/Joseph Stalin/false
+10/Adolf Hitler/false
+11/William Shakespeare/true
+11/Charles Dickens/false
+11/Jane Austen/false
+11/Mark Twain/false
+12/Harry Potter and the Philosopher's Stone/true
+12/Harry Potter and the Chamber of Secrets/false
+12/Harry Potter and the Prisoner of Azkaban/false
+12/Harry Potter and the Goblet of Fire/false
+13/Jane Austen/true
+13/Charlotte Bronte/false
+13/Emily Bronte/false
+13/Mary Shelley/false
+14/War and Peace/true
+14/Anna Karenina/false
+14/The Death of Ivan Ilyich/false
+14/Resurrection/false
+15/Homer/true
+15/Virgil/false
+15/Dante Alighieri/false
+15/Plato/false
+16/Michael Jackson/true
+16/Elvis Presley/false
+16/Prince/false
+16/Freddie Mercury/false
+17/Forrest Gump/true
+17/The Shawshank Redemption/false
+17/Pulp Fiction/false
+17/Schindler's List/false
+18/Central Perk/true
+18/Monk's Cafe/false
+18/MacLaren's Pub/false
+18/The Max/false
+19/Leonardo DiCaprio/true
+19/Brad Pitt/false
+19/Tom Cruise/false
+19/Johnny Depp/false
+20/Leonardo da Vinci/true
+20/Vincent van Gogh/false
+20/Pablo Picasso/false
+20/Claude Monet/false
+21/Nitrogen/true
+21/Oxygen/false
+21/Carbon Dioxide/false
+21/Hydrogen/false
+22/Diamond/true
+22/Gold/false
+22/Iron/false
+22/Silver/false
+23/"299,792 km/s"/true
+23/"150,000 km/s"/false
+23/"500,000 km/s"/false
+23/"1,000,000 km/s"/false
+24/Saturn/true
+24/Jupiter/false
+24/Uranus/false
+24/Neptune/false
+25/Hydrogen/true
+25/Oxygen/false
+25/Carbon/false
+25/Helium/false
+26/Thomas Jefferson/true
+26/George Washington/false
+26/John Adams/false
+26/Benjamin Franklin/false
+27/1989/true
+27/1987/false
+27/1991/false
+27/1993/false
+28/Neil Armstrong/true
+28/Buzz Aldrin/false
+28/Michael Collins/false
+28/Yuri Gagarin/false
+29/Byzantium/true
+29/Athens/false
+29/Alexandria/false
+29/Carthage/false
+30/Romulus Augustulus/true
+30/Julius Caesar/false
+30/Nero/false
+30/Constantine/false
+31/George Orwell/true
+31/Aldous Huxley/false
+31/Ray Bradbury/false
+31/J.K. Rowling/false
+32/Harper Lee/true
+32/J.D. Salinger/false
+32/F. Scott Fitzgerald/false
+32/Mark Twain/false
+33/Herman Melville/true
+33/Jules Verne/false
+33/Ernest Hemingway/false
+33/Jack London/false
+34/F. Scott Fitzgerald/true
+34/Ernest Hemingway/false
+34/John Steinbeck/false
+34/T.S. Eliot/false
+35/Dante Alighieri/true
+35/Geoffrey Chaucer/false
+35/Homer/false
+35/Virgil/false
+36/George Lucas/true
+36/Steven Spielberg/false
+36/James Cameron/false
+36/J.J. Abrams/false
+37/Avatar/true
+37/Avengers: Endgame/false
+37/Titanic/false
+37/Star Wars: The Force Awakens/false
+38/The Beatles/true
+38/The Rolling Stones/false
+38/Led Zeppelin/false
+38/Pink Floyd/false
+39/Robert Downey Jr./true
+39/Chris Hemsworth/false
+39/Chris Evans/false
+39/Mark Ruffalo/false
+40/J.K. Rowling/true
+40/Suzanne Collins/false
+40/Stephenie Meyer/false
+40/George R.R. Martin/false
+41/100°C/true
+41/0°C/false
+41/50°C/false
+41/200°C/false
+42/Heart/true
+42/Liver/false
+42/Brain/false
+42/Lung/false
+43/Cell/true
+43/Atom/false
+43/Molecule/false
+43/Organ/false
+44/Oxygen/true
+44/Gold/false
+44/Silver/false
+44/Iron/false
+45/Mercury/true
+45/Venus/false
+45/Earth/false
+45/Mars/false
+46/Margaret Thatcher/true
+46/Angela Merkel/false
+46/Theresa May/false
+46/Indira Gandhi/false
+47/Titanic/true
+47/Lusitania/false
+47/Britannic/false
+47/Queen Mary/false
+48/Wright Flyer/true
+48/Spirit of St. Louis/false
+48/Flyer II/false
+48/Concorde/false
+49/Qin Shi Huang/true
+49/Genghis Khan/false
+49/Kublai Khan/false
+49/Mao Zedong/false
+50/Berlin Wall/true
+50/Great Wall of China/false
+50/Hadrian's Wall/false
+50/Maginot Line/false
+51/J.D. Salinger/true
+51/F. Scott Fitzgerald/false
+51/Harper Lee/false
+51/Ernest Hemingway/false
+52/Charlotte Bronte/true
+52/Emily Bronte/false
+52/Jane Austen/false
+52/Mary Shelley/false
+53/J.R.R. Tolkien/true
+53/C.S. Lewis/false
+53/J.K. Rowling/false
+53/George R.R. Martin/false
+54/Mark Twain/true
+54/Charles Dickens/false
+54/Ernest Hemingway/false
+54/F. Scott Fitzgerald/false
+55/James Joyce/true
+55/William Faulkner/false
+55/T.S. Eliot/false
+55/Virginia Woolf/false
+56/Game of Thrones/true
+56/The Walking Dead/false
+56/Breaking Bad/false
+56/Stranger Things/false
+57/Matt Groening/true
+57/Seth MacFarlane/false
+57/Trey Parker/false
+57/Mike Judge/false
+58/Link/true
+58/Zelda/false
+58/Ganon/false
+58/Epona/false
+59/Bryan Cranston/true
+59/Aaron Paul/false
+59/Dean Norris/false
+59/Bob Odenkirk/false
+60/Bob Dylan/true
+60/Jimi Hendrix/false
+60/Bruce Springsteen/false
+60/Paul Simon/false

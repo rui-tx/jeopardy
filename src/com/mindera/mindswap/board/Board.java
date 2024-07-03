@@ -3,6 +3,7 @@ package com.mindera.mindswap.board;
 import com.mindera.mindswap.utils.CSVReader;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
@@ -13,13 +14,11 @@ import static com.mindera.mindswap.utils.TerminalColors.*;
 
 public class Board {
     private final Cell[][] gameBoard;
-    private final Map<String, ArrayList<Question>> questionsByCategory;
-    private final Map<String, ArrayList<Answer>> answersById;
 
     public Board() {
         gameBoard = new Cell[BOARD_SIZE][BOARD_SIZE];
-        questionsByCategory = getQuestions();
-        answersById = getAnswers();
+        Map<String, ArrayList<Question>> questionsByCategory = getQuestions();
+        Map<String, ArrayList<Answer>> answersById = getAnswers();
         populateBoardWithQuestionsAndAnswers(questionsByCategory, answersById);
     }
 
@@ -41,7 +40,7 @@ public class Board {
     private StringBuilder promptQuestionAndAnswers(Cell cell) {
         StringBuilder sb = new StringBuilder();
 
-        sb.append("Question: ").append(cell.question.questionText).append(System.lineSeparator());
+        sb.append(cell.question.questionValue).append(System.lineSeparator()).append(cell.question.questionText).append(System.lineSeparator());
 
         int optionNumber = 1;
         for (Answer answer : cell.answers) {
@@ -54,7 +53,7 @@ public class Board {
     public String selectQuestion(int questionNumber) {
         Cell cell = getCellByQuestionNumber(questionNumber);
         if (cell == null) {
-            return ANSI_YELLOW + "Invalid question selection. That question already been answered, choose another " + ANSI_RESET + System.lineSeparator();
+            return ANSI_YELLOW + "Invalid question selection. That question already been answered, choose another." + ANSI_RESET + System.lineSeparator();
         }
         return String.valueOf(promptQuestionAndAnswers(cell));
     }
@@ -74,7 +73,7 @@ public class Board {
         return null;
     }
 
-    public StringBuilder displayBoard() {
+    public String displayBoard() {
         StringBuilder sb = new StringBuilder();
         int counter = 1;
         for (int row = 0; row < BOARD_SIZE; row++) {
@@ -85,7 +84,7 @@ public class Board {
                 }
             }
         }
-        return sb;
+        return String.valueOf(sb);
     }
 
     private void populateBoardWithQuestionsAndAnswers(Map<String, ArrayList<Question>> questionsByCategory, Map<String, ArrayList<Answer>> answersById) {
@@ -96,11 +95,14 @@ public class Board {
                 String category = categories.get(col);
                 ArrayList<Question> questions = questionsByCategory.get(category);
 
+                // Shuffle the questions to pick random ones
+                Collections.shuffle(questions);
+
                 IntStream.range(0, BOARD_SIZE).forEach(row -> {
                     if (row < questions.size()) {
                         Question question = questions.get(row);
                         ArrayList<Answer> answers = answersById.get(question.id);
-                        gameBoard[row][col] = new Cell(question, answers);
+                        gameBoard[row][col] = Cell.createCell(question, answers);
                     } else {
                         gameBoard[row][col] = null;
                     }
@@ -122,8 +124,9 @@ public class Board {
         return CSVReader.readItems(QUESTIONS_FILE_PATH, columns -> {
             String id = columns[0];
             String category = columns[1];
-            String questionText = columns[2];
-            return new Question(id, category, questionText);
+            String questionValue = columns[2];
+            String questionText = columns[3];
+            return new Question(id, category, questionValue, questionText);
         }, 1);
     }
 }

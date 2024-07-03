@@ -4,25 +4,15 @@ package com.mindera.mindswap.board;
 public class Question {
     String id;
     String category;
+    String questionValue;
     String questionText;
 
-    public Question(String id, String category, String questionText) {
+
+    public Question(String id, String category, String questionValue, String questionText) {
         this.id = id;
         this.category = category;
+        this.questionValue = questionValue;
         this.questionText = questionText;
-    }
-
-
-    public String getId() {
-        return id;
-    }
-
-    public String getCategory() {
-        return category;
-    }
-
-    public String getQuestionText() {
-        return questionText;
     }
 
     @Override
@@ -30,6 +20,7 @@ public class Question {
         return "Question{" +
                 "id='" + id + '\'' +
                 ", category='" + category + '\'' +
+                ", questionValue='" + questionValue + '\'' +
                 ", questionText='" + questionText + '\'' +
                 '}';
     }

@@ -197,7 +197,8 @@ public class Client {
 
                     if (state == ClientState.QUESTIONING) {
                         String regex = "^(1[0-6]|[1-9])$";
-                        if(!input.matches(regex)) {
+                        String cleanedInput = input.replaceAll("\\s", ""); // Remove all white spaces
+                        if(!cleanedInput.matches(regex)) {
                             Messages.printMessage(Messages.BAD_QUESTION);
                             Messages.printMessage(Messages.SELECT_QUESTION);
                             continue;
@@ -206,7 +207,8 @@ public class Client {
 
                     if (state == ClientState.ANSWERING) {
                         String regex = "^([1-4])$";
-                        if(!input.matches(regex)) {
+                        String cleanedInput = input.replaceAll("\\s", ""); // Remove all white spaces
+                        if(!cleanedInput.matches(regex)) {
                             Messages.printMessage(Messages.BAD_ANSWER);
                             Messages.printMessage(Messages.SELECT_ANSWER);
                             continue;
