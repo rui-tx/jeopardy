@@ -89,28 +89,35 @@ public class Board {
 
     public String displayPrettyBoard() {
         StringBuilder prettyBoard = new StringBuilder();
-        int testQuestionAmount = 100;
         int counter = 1;
 
-        // Add top border
-        //prettyBoard.append(" _______________________________________________________________ \n");
+        // hacky way to get the category names
+        String[] catNames = new String[BOARD_SIZE];
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            catNames[i] = gameBoard[0][i].question.category;
+        }
+
         prettyBoard.append("\n");
-        prettyBoard.append(" =================================================================================== \n");
-        //prettyBoard.append("| CAT1               | CAT2               | CAT3               | CAT4               |\n");
+        prettyBoard.append(ANSI_CYAN + " =================================================================================== \n" + ANSI_RESET);
+        String format = ANSI_PURPLE + "| %-18s | %-18s | %-18s | %-18s | " + ANSI_RESET + "\n";
+        prettyBoard.append(String.format(format, catNames[0], catNames[1], catNames[2], catNames[3]));
+        prettyBoard.append(ANSI_CYAN + " =================================================================================== \n" + ANSI_RESET);
+
         for (int row = 0; row < BOARD_SIZE; row++) {
             for (int col = 0; col < BOARD_SIZE; col++) {
                 if (gameBoard[row][col] != null) {
-                    String format = "| Question " + ANSI_GREEN + "%-2d" + ANSI_RESET + " - %3d$ ";
-                    prettyBoard.append(String.format(format, counter, testQuestionAmount));
+                    format = "| Question " + ANSI_GREEN + "%-2d" + ANSI_RESET + " - %3s ";
+                    prettyBoard.append(String.format(format, counter, gameBoard[row][col].question.questionValue));
                     counter++;
                 } else {
-                    prettyBoard.append("|     --------       ");
+                    format = "| " + ANSI_RED + "------------------ " + ANSI_RESET;
+                    prettyBoard.append(String.format(format, counter, gameBoard[row][col].question.questionValue));
                 }
             }
             prettyBoard.append("|\n");
         }
 
-        prettyBoard.append(" =================================================================================== \n");
+        prettyBoard.append(ANSI_CYAN + " =================================================================================== \n" + ANSI_RESET);
         return prettyBoard.toString();
     }
 
