@@ -74,7 +74,7 @@ public class Board {
         return null;
     }
 
-    public StringBuilder displayBoard() {
+    public String displayBoard() {
         StringBuilder sb = new StringBuilder();
         int counter = 1;
         for (int row = 0; row < BOARD_SIZE; row++) {
@@ -85,7 +85,7 @@ public class Board {
                 }
             }
         }
-        return sb;
+        return String.valueOf(sb);
     }
 
     private void populateBoardWithQuestionsAndAnswers(Map<String, ArrayList<Question>> questionsByCategory, Map<String, ArrayList<Answer>> answersById) {
