@@ -14,7 +14,7 @@ import java.util.concurrent.Executors;
 
 public class Server {
 
-    private final int MAX_CLIENTS = 1;
+    private final int MAX_CLIENTS = 2;
     private final List<ClientConnectionHandler> clients;
     private ServerSocket serverSocket;
     private int port;
@@ -116,6 +116,8 @@ public class Server {
 
             winner = gameTurn();
             broadcast("[server] Round winner: " + winner + " !");
+            broadcast("[server] Current score:");
+            clients.forEach(handler -> broadcast(handler.getName() + " has " + handler.getTurnsWon() + " wins"));
         }
     }
 
@@ -200,7 +202,8 @@ public class Server {
     }
 
     private String gameTurn() {
-        String winner = "";
+        String winner = "No winner in this round";
+        String fastestPlayer = "";
         long lowestTime = 1_000_000;
 
 
@@ -226,9 +229,19 @@ public class Server {
             // Determine the winner based on the lowest response time
             if (handler.getMessageTime() < lowestTime) {
                 lowestTime = handler.getMessageTime();
-                winner = handler.getName();
+                fastestPlayer = handler.getName();
+            }
+
+            // check if the player won
+            if (board.checkAnswerBool(questionNumber, selectedAnswer)) {
+                if (handler.getName().equals(fastestPlayer)) {
+                    handler.turnWon();
+                    winner = handler.getName();
+                }
             }
         }
+
+
         // Lock all players again
         broadcast("/lock");
 
@@ -247,6 +260,7 @@ public class Server {
         private boolean gameTurn;
         private boolean hasPlayed;
         private int questionNumber;
+        private int turnsWon;
 
         public ClientConnectionHandler(Socket clientSocket, String name) throws IOException {
             this.clientSocket = clientSocket;
@@ -365,6 +379,14 @@ public class Server {
 
         public void setQuestionNumber(int questionNumber) {
             this.questionNumber = questionNumber;
+        }
+
+        public int getTurnsWon() {
+            return turnsWon;
+        }
+
+        public void turnWon() {
+            turnsWon++;
         }
     }
 }
