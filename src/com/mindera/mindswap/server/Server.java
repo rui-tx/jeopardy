@@ -125,7 +125,9 @@ public class Server {
 
         for (ClientConnectionHandler handler : clients) {
             Thread answerThread = new Thread(() -> {
-                int selectedAnswer = Integer.parseInt(handler.getAnswer());
+                String input = handler.getAnswer();
+                String cleanedInput = input.replaceAll("\\s", ""); // Remove all white spaces
+                int selectedAnswer = Integer.parseInt(cleanedInput);
                 synchronized (playerAnswers) {
                     playerAnswers.put(handler, selectedAnswer);
                 }
@@ -147,7 +149,7 @@ public class Server {
     private void broadcastQuestionAndAnswers(int questionNumber, ClientConnectionHandler currentHandler) {
         // Broadcast the selected question to all players
         String questionResponse = board.selectQuestion(questionNumber);
-        broadcast("Question selected by " + currentHandler.getName() + ": " + questionResponse);
+        broadcast("Question selected by " + currentHandler.getName() + " for " + questionResponse);
 
         // Notify all players to select an answer
         broadcast("/unlock");
@@ -164,7 +166,10 @@ public class Server {
         currentHandler.send("Select a question number (1-16):");
         currentHandler.send("/state question");
 
-        int questionNumber = Integer.parseInt(currentHandler.getAnswer());
+        String input = currentHandler.getAnswer();
+        String cleanedInput = input.replaceAll("\\s", ""); // Remove all white spaces
+
+        int questionNumber = Integer.parseInt(cleanedInput);
 
         currentHandler.send("/lock");
         return questionNumber;

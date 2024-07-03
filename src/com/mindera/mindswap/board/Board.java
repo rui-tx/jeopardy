@@ -3,6 +3,7 @@ package com.mindera.mindswap.board;
 import com.mindera.mindswap.utils.CSVReader;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
@@ -13,13 +14,11 @@ import static com.mindera.mindswap.utils.TerminalColors.*;
 
 public class Board {
     private final Cell[][] gameBoard;
-    private final Map<String, ArrayList<Question>> questionsByCategory;
-    private final Map<String, ArrayList<Answer>> answersById;
 
     public Board() {
         gameBoard = new Cell[BOARD_SIZE][BOARD_SIZE];
-        questionsByCategory = getQuestions();
-        answersById = getAnswers();
+        Map<String, ArrayList<Question>> questionsByCategory = getQuestions();
+        Map<String, ArrayList<Answer>> answersById = getAnswers();
         populateBoardWithQuestionsAndAnswers(questionsByCategory, answersById);
     }
 
@@ -41,7 +40,7 @@ public class Board {
     private StringBuilder promptQuestionAndAnswers(Cell cell) {
         StringBuilder sb = new StringBuilder();
 
-        sb.append("Question: ").append(cell.question.questionText).append(System.lineSeparator());
+        sb.append(cell.question.questionValue).append(System.lineSeparator()).append(cell.question.questionText).append(System.lineSeparator());
 
         int optionNumber = 1;
         for (Answer answer : cell.answers) {
@@ -54,7 +53,7 @@ public class Board {
     public String selectQuestion(int questionNumber) {
         Cell cell = getCellByQuestionNumber(questionNumber);
         if (cell == null) {
-            return ANSI_YELLOW + "Invalid question selection. That question already been answered, choose another " + ANSI_RESET + System.lineSeparator();
+            return ANSI_YELLOW + "Invalid question selection. That question already been answered, choose another." + ANSI_RESET + System.lineSeparator();
         }
         return String.valueOf(promptQuestionAndAnswers(cell));
     }
@@ -95,6 +94,9 @@ public class Board {
             if (col < categories.size()) {
                 String category = categories.get(col);
                 ArrayList<Question> questions = questionsByCategory.get(category);
+
+                // Shuffle the questions to pick random ones
+                Collections.shuffle(questions);
 
                 IntStream.range(0, BOARD_SIZE).forEach(row -> {
                     if (row < questions.size()) {
