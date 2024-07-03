@@ -100,7 +100,7 @@ public class Board {
                     if (row < questions.size()) {
                         Question question = questions.get(row);
                         ArrayList<Answer> answers = answersById.get(question.id);
-                        gameBoard[row][col] = new Cell(question, answers);
+                        gameBoard[row][col] = Cell.createCell(question, answers);
                     } else {
                         gameBoard[row][col] = null;
                     }
@@ -122,8 +122,9 @@ public class Board {
         return CSVReader.readItems(QUESTIONS_FILE_PATH, columns -> {
             String id = columns[0];
             String category = columns[1];
-            String questionText = columns[2];
-            return new Question(id, category, questionText);
+            String questionValue = columns[2];
+            String questionText = columns[3];
+            return new Question(id, category, questionValue, questionText);
         }, 1);
     }
 }

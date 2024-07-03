@@ -12,19 +12,6 @@ public class Answer {
         this.isCorrect = isCorrect;
     }
 
-
-    public String getId() {
-        return id;
-    }
-
-    public String getAnswerText() {
-        return answerText;
-    }
-
-    public boolean isCorrect() {
-        return isCorrect;
-    }
-
     @Override
     public String toString() {
         return "Answer{" +
