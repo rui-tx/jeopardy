@@ -1,6 +1,5 @@
 package com.mindera.mindswap.server;
 
-import com.mindera.mindswap.Game;
 import com.mindera.mindswap.board.Board;
 
 import java.io.BufferedWriter;
@@ -8,8 +7,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -22,9 +20,8 @@ public class Server {
     private int port;
     private ExecutorService threads;
     private boolean gameStarted;
-    // Additions
     private Board board;
-    private Game game;
+    private int currentPlayerIndex;
 
 
     public Server(int port) {
@@ -33,7 +30,8 @@ public class Server {
         this.gameStarted = false;
         // Additions
         board = new Board();
-        game = new Game(board);
+        currentPlayerIndex = 0;
+
     }
 
     public void start() {
@@ -56,7 +54,7 @@ public class Server {
                         e.printStackTrace();
                     }
                 }
-                broadcast("[server]", "Game will start in 10 seconds.");
+                broadcast("[server] " + "Game will start in 10 seconds.");
                 gameStart();
             }));
 
@@ -90,10 +88,21 @@ public class Server {
         //cHandler.send(cHandler.getName());
     }
 
-    public void broadcast(String name, String message) {
+    public void broadcast(String name, String message, boolean includeName) {
         clients.stream()
                 .filter(handler -> !handler.getName().equals(name))
-                .forEach(handler -> handler.send(name + ": " + message));
+                .forEach(handler -> {
+                    if (includeName) {
+                        handler.send(name + ": " + message);
+                    } else {
+                        handler.send(message);
+                    }
+                });
+    }
+
+    // Overloaded broadcast method for convenience´
+    public void broadcast(String message) {
+        clients.forEach(handler -> handler.send(message));
     }
 
     public void gameStart() {
@@ -102,13 +111,74 @@ public class Server {
 
         String winner = "";
         while (true) {
-            ClientConnectionHandler handler = selectPlayer();
-            getQuestionNumber(handler);
+            //ClientConnectionHandler handler = selectPlayer();
+            //getQuestionNumber(handler);
 
             winner = gameTurn();
-            broadcast("[server] Round winner: ", winner + " !");
-
+            broadcast("[server] Round winner: " + winner + " !");
         }
+    }
+
+    private Map<ClientConnectionHandler, Integer> collectAnswers() {
+        Map<ClientConnectionHandler, Integer> playerAnswers = new HashMap<>();
+        List<Thread> answerThreads = new ArrayList<>();
+
+        for (ClientConnectionHandler handler : clients) {
+            Thread answerThread = new Thread(() -> {
+                String input = handler.getAnswer();
+                String cleanedInput = input.replaceAll("\\s", ""); // Remove all white spaces
+                int selectedAnswer = Integer.parseInt(cleanedInput);
+                synchronized (playerAnswers) {
+                    playerAnswers.put(handler, selectedAnswer);
+                }
+            });
+            answerThreads.add(answerThread);
+            answerThread.start();
+        }
+
+        for (Thread thread : answerThreads) {
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        return playerAnswers;
+    }
+
+    private void broadcastQuestionAndAnswers(int questionNumber, ClientConnectionHandler currentHandler) {
+        // Broadcast the selected question to all players
+        String questionResponse = board.selectQuestion(questionNumber);
+        broadcast("Question selected by " + currentHandler.getName() + " for " + questionResponse);
+
+        // Notify all players to select an answer
+        broadcast("/unlock");
+        broadcast("Select an answer (1-4):");
+        broadcast("/state answer");
+    }
+
+    private int handleQuestionSelection(ClientConnectionHandler currentHandler) {
+        currentHandler.send("/unlock");
+        currentHandler.send("It's your turn!");
+
+        // Display the board and let the current player select a question
+        currentHandler.send(board.displayPrettyBoard());
+        currentHandler.send("Select a question number (1-16):");
+        currentHandler.send("/state question");
+
+        String input = currentHandler.getAnswer();
+        String cleanedInput = input.replaceAll("\\s", ""); // Remove all white spaces
+
+        int questionNumber = Integer.parseInt(cleanedInput);
+
+        currentHandler.send("/lock");
+        return questionNumber;
+    }
+
+    /*
+    private ClientConnectionHandler resetAndGetPlayer() {
+        clients.forEach(c -> c.hasPlayed = false);
+        return clients.getFirst();
     }
 
     private ClientConnectionHandler selectPlayer() {
@@ -118,65 +188,53 @@ public class Server {
                 return handler;
             }
         }
-
         // no player has played yet, reset and return the first player
         return resetAndGetPlayer();
     }
+     */
 
-    private ClientConnectionHandler resetAndGetPlayer() {
-        clients.forEach(c -> c.hasPlayed = false);
-        return clients.getFirst();
+    private ClientConnectionHandler selectPlayer() {
+        ClientConnectionHandler currentPlayer = clients.get(currentPlayerIndex);
+        currentPlayerIndex = (currentPlayerIndex + 1) % clients.size();
+        return currentPlayer;
     }
-
-    private void getQuestionNumber(ClientConnectionHandler handler) {
-        handler.send("/unlock");
-        // Display the board and let the client select a question
-        handler.send(board.displayPrettyBoard());
-        handler.send("Select a question number (1-16):");
-        handler.send("/state question");
-        int questionNumber = Integer.parseInt(handler.getAnswer());
-
-        // set question number for all players
-        clients.forEach(c -> c.setQuestionNumber(questionNumber));
-
-        handler.send("/lock");
-        handler.send("/state idle");
-    }
-
 
     private String gameTurn() {
         String winner = "";
-        long lowestTime = 1000000;
+        long lowestTime = 1_000_000;
 
-        clients.forEach(c -> c.send("Wait for other players to answer..."));
 
-        for (ClientConnectionHandler handler : clients) {
-            handler.send("/unlock");
-            handler.send("Answer your question!");
+        // Select the current player to choose the question
+        ClientConnectionHandler currentPlayer = selectPlayer();
 
+        // Handle player question selection
+        int questionNumber = handleQuestionSelection(currentPlayer);
+
+        // Start a new thread to broadcast the question and answers
+        threads.submit(new Thread(() -> broadcastQuestionAndAnswers(questionNumber, currentPlayer)));
+
+        // Collect answers from all players
+        Map<ClientConnectionHandler, Integer> playerAnswers = collectAnswers();
+
+        // Check the answers and send the results to each player
+        for (Map.Entry<ClientConnectionHandler, Integer> entry : playerAnswers.entrySet()) {
+            ClientConnectionHandler handler = entry.getKey();
+            int selectedAnswer = entry.getValue();
+            String answerResponse = board.checkAnswer(questionNumber, selectedAnswer);
+            handler.send(answerResponse);
+
+            // Determine the winner based on the lowest response time
             if (handler.getMessageTime() < lowestTime) {
                 lowestTime = handler.getMessageTime();
                 winner = handler.getName();
             }
-
-            // Send the selected question to the client
-            String questionResponse = board.selectQuestion(handler.getQuestionNumber());
-            handler.send(questionResponse);
-
-            // Receive the answer from the client
-            handler.send("Select an answer (1-4):");
-            handler.send("/state answer");
-            int selectedAnswer = Integer.parseInt(handler.getAnswer());
-
-            // Check the answer and send the result to the client
-            String answerResponse = board.checkAnswer(handler.getQuestionNumber(), selectedAnswer);
-            handler.send(answerResponse);
-
-            handler.send("/lock");
         }
+        // Lock all players again
+        broadcast("/lock");
 
         return winner;
     }
+
 
     public class ClientConnectionHandler implements Runnable {
 
@@ -206,7 +264,7 @@ public class Server {
             welcome();
             send("/lock");
 
-            broadcast("[server]", this.getName() + " connected");
+            broadcast("[server] " + this.getName() + " connected");
         }
 
         public synchronized String getAnswer() {

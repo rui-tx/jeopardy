@@ -1,20 +1,60 @@
-1,Science & Nature,Which element has the chemical symbol 'O'?
-2,Science & Nature,What is the process by which plants convert sunlight into food called?
-3,Science & Nature,Which planet is known as the Red Planet?
-4,Science & Nature,What is known as the powerhouse of the cell?
-5,Science & Nature,What natural phenomenon is measured by the Richter scale?
-6,History,Who was the first President of the United States?
-7,History,Which war was fought between the North and South regions of the United States from 1861 to 1865?
-8,History,"Which document, signed in 1215, limited the power of the King of England?"
-9,History,Which city was the target of the first atomic bomb used in warfare?
-10,History,The Renaissance began in which European country?
-11,Literature,"Who wrote ""1984"" and ""Animal Farm""?"
-12,Literature,The character Atticus Finch appears in which classic novel?
-13,Literature,"Which playwright is known for works like ""Hamlet"" and ""Romeo and Juliet""?"
-14,Literature,"""Moby Dick"" is a novel about a captain's obsession with which animal?"
-15,Literature,Which series of books features a boy who learns he is a wizard on his 11th birthday?
-16,Pop Culture,"Which band released the album ""Abbey Road"" in 1969?"
-17,Pop Culture,Which 2021 film won the Academy Award for Best Picture?
-18,Pop Culture,Which television series features the characters Jon Snow and Daenerys Targaryen?
-19,Pop Culture,"Which artist is known for hits like ""Shape of You"" and ""Perfect""?"
-20,Pop Culture,Which video game series features characters like Link and Zelda?
+1/Science & Nature/$100/What is the chemical symbol for water?
+2/Science & Nature/$200/What planet is known as the Red Planet?
+3/Science & Nature/$300/What is the powerhouse of the cell?
+4/Science & Nature/$400/What gas do plants absorb from the atmosphere?
+5/Science & Nature/$500/What is the most abundant gas in the Earth's atmosphere?
+6/History/$100/Who was the first President of the United States?
+7/History/$200/In which year did World War II end?
+8/History/$300/Who discovered America in 1492?
+9/History/$400/What ancient civilization built the pyramids?
+10/History/$500/Who was the British Prime Minister during World War II?
+11/Literature/$100/Who wrote 'Romeo and Juliet'?
+12/Literature/$200/What is the title of the first Harry Potter book?
+13/Literature/$300/Who is the author of 'Pride and Prejudice'?
+14/Literature/$400/What is the longest novel written by Leo Tolstoy?
+15/Literature/$500/Who wrote 'The Odyssey'?
+16/Pop Culture/$100/Who is known as the King of Pop?
+17/Pop Culture/$200/Which movie won the Oscar for Best Picture in 1994?
+18/Pop Culture/$300/What is the name of the coffee shop in 'Friends'?
+19/Pop Culture/$400/Who played Jack Dawson in 'Titanic'?
+20/Pop Culture/$500/Which artist painted the Mona Lisa?
+21/Science & Nature/$100/What is the main gas found in the air we breathe?
+22/Science & Nature/$200/What is the hardest natural substance on Earth?
+23/Science & Nature/$300/What is the speed of light?
+24/Science & Nature/$400/What planet is known for its rings?
+25/Science & Nature/$500/What is the most common element in the universe?
+26/History/$100/Who wrote the Declaration of Independence?
+27/History/$200/What year did the Berlin Wall fall?
+28/History/$300/Who was the first man to walk on the moon?
+29/History/$400/What was the ancient name of Istanbul?
+30/History/$500/Who was the last Emperor of Rome?
+31/Literature/$100/Who wrote '1984'?
+32/Literature/$200/Who wrote 'To Kill a Mockingbird'?
+33/Literature/$300/Who wrote 'Moby Dick'?
+34/Literature/$400/Who wrote 'The Great Gatsby'?
+35/Literature/$500/Who wrote 'The Divine Comedy'?
+36/Pop Culture/$100/Who created the Star Wars franchise?
+37/Pop Culture/$200/What is the highest-grossing film of all time?
+38/Pop Culture/$300/What band was John Lennon a member of?
+39/Pop Culture/$400/Who played Tony Stark in the Marvel Cinematic Universe?
+40/Pop Culture/$500/Who is the author of the Harry Potter series?
+41/Science & Nature/$100/What is the boiling point of water at sea level?
+42/Science & Nature/$200/What organ is responsible for pumping blood throughout the body?
+43/Science & Nature/$300/What is the smallest unit of life?
+44/Science & Nature/$400/What element does 'O' represent on the periodic table?
+45/Science & Nature/$500/What planet is closest to the Sun?
+46/History/$100/Who was the first female Prime Minister of the United Kingdom?
+47/History/$200/What ship famously sank in 1912?
+48/History/$300/What was the name of the first successful airplane?
+49/History/$400/Who was the first emperor of China?
+50/History/$500/What famous wall separated East and West Berlin?
+51/Literature/$100/Who wrote 'The Catcher in the Rye'?
+52/Literature/$200/Who wrote 'Jane Eyre'?
+53/Literature/$300/Who wrote 'The Hobbit'?
+54/Literature/$400/Who wrote 'The Adventures of Tom Sawyer'?
+55/Literature/$500/Who wrote 'Ulysses'?
+56/Pop Culture/$100/What TV show is known for the phrase 'Winter is coming'?
+57/Pop Culture/$200/Who is the creator of the animated TV show 'The Simpsons'?
+58/Pop Culture/$300/What is the name of the protagonist in the video game series 'The Legend of Zelda'?
+59/Pop Culture/$400/Which actor played the character of Walter White in 'Breaking Bad'?
+60/Pop Culture/$500/Which artist is famous for the song 'Like a Rolling Stone'?

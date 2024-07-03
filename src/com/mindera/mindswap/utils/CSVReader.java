@@ -19,7 +19,7 @@ public class CSVReader {
 
         try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
             while ((line = br.readLine()) != null) {
-                String[] columns = line.split(",");
+                String[] columns = line.split("/");
                 if (columns.length > keyIndex) {
                     String key = columns[keyIndex];
                     T item = mapper.apply(columns);
