@@ -37,6 +37,17 @@ public class Board {
         }
     }
 
+    public boolean checkAnswerBool(int questionNumber, int selectedAnswer) {
+        Cell cell = getCellByQuestionNumber(questionNumber);
+
+        if (selectedAnswer <= 0 || selectedAnswer > cell.answers.size()) {
+            return false;
+        }
+        Answer answer = cell.answers.get(selectedAnswer - 1);
+        return answer.isCorrect;
+
+    }
+
     private StringBuilder promptQuestionAndAnswers(Cell cell) {
         StringBuilder sb = new StringBuilder();
 
