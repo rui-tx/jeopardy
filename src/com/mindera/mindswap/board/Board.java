@@ -50,7 +50,7 @@ public class Board {
 
     public Integer getQuestionValue(int questionNumber) {
         Cell cell = getCellByQuestionNumber(questionNumber);
-        return Integer.parseInt(cell.question.questionValue.substring(1));
+        return Integer.parseInt(cell.question.questionValue);
     }
 
     private StringBuilder promptQuestionAndAnswers(Cell cell) {
