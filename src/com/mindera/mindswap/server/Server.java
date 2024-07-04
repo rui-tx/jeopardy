@@ -117,7 +117,8 @@ public class Server {
             winner = gameTurn();
             broadcast("[server] Round winner: " + winner + " !");
             broadcast("[server] Current score:");
-            clients.forEach(handler -> broadcast(handler.getName() + " has " + handler.getTurnsWon() + " wins"));
+            clients.forEach(handler -> broadcast(handler.getName() + " has " + handler.getTurnsWon() + " wins" +
+                    " and " + handler.getScore() + "$"));
         }
     }
 
@@ -237,6 +238,7 @@ public class Server {
             if (board.checkAnswerBool(questionNumber, selectedAnswer)) {
                 if (handler.getName().equals(fastestPlayer)) {
                     handler.turnWon();
+                    handler.increaseScore(board.getQuestionValue(questionNumber));
                     winner = handler.getName();
                 }
             }
@@ -262,6 +264,7 @@ public class Server {
         private boolean hasPlayed;
         private int questionNumber;
         private int turnsWon;
+        private int score;
 
         public ClientConnectionHandler(Socket clientSocket, String name) throws IOException {
             this.clientSocket = clientSocket;
@@ -388,6 +391,14 @@ public class Server {
 
         public void turnWon() {
             turnsWon++;
+        }
+
+        public int getScore() {
+            return score;
+        }
+
+        public void increaseScore(int points) {
+            score += points;
         }
     }
 }
