@@ -23,7 +23,30 @@ public class Board {
     }
 
 
-    public String checkAnswer(int questionNumber, int selectedAnswer) {
+    public boolean isGameOver() {
+        int totalQuestions = BOARD_SIZE * BOARD_SIZE;
+        int answeredQuestions = 0;
+
+        for (int row = 0; row < BOARD_SIZE; row++) {
+            for (int col = 0; col < BOARD_SIZE; col++) {
+                if (gameBoard[row][col] != null && gameBoard[row][col].question.isAnswered) {
+                    answeredQuestions++;
+                }
+            }
+        }
+        return answeredQuestions == totalQuestions;
+    }
+
+    public boolean checkAnswerBool(int questionNumber, int selectedAnswer) {
+        Cell cell = getCellByQuestionNumber(questionNumber);
+        if (selectedAnswer <= 0 || selectedAnswer > cell.answers.size()) {
+            return false;
+        }
+        Answer answer = cell.answers.get(selectedAnswer - 1);
+        return answer.isCorrect;
+    }
+
+    public String validateAnswer(int questionNumber, int selectedAnswer) {
         Cell cell = getCellByQuestionNumber(questionNumber);
 
         if (selectedAnswer <= 0 || selectedAnswer > cell.answers.size()) {
@@ -37,15 +60,22 @@ public class Board {
         }
     }
 
-    public boolean checkAnswerBool(int questionNumber, int selectedAnswer) {
-        Cell cell = getCellByQuestionNumber(questionNumber);
-
-        if (selectedAnswer <= 0 || selectedAnswer > cell.answers.size()) {
-            return false;
+    public boolean processQuestionBoolean(int questionNumber, boolean markAsAnswered) {
+        int counter = 1;
+        for (int row = 0; row < BOARD_SIZE; row++) {
+            for (int col = 0; col < BOARD_SIZE; col++) {
+                if (gameBoard[row][col] != null) {
+                    if (counter == questionNumber) {
+                        if (markAsAnswered) {
+                            gameBoard[row][col].question.isAnswered = true;
+                        }
+                        return gameBoard[row][col].question.isAnswered;
+                    }
+                    counter++;
+                }
+            }
         }
-        Answer answer = cell.answers.get(selectedAnswer - 1);
-        return answer.isCorrect;
-
+        return false;
     }
 
     public Integer getQuestionValue(int questionNumber) {
@@ -69,7 +99,7 @@ public class Board {
     public String selectQuestion(int questionNumber) {
         Cell cell = getCellByQuestionNumber(questionNumber);
         if (cell == null) {
-            return ANSI_YELLOW + "Invalid question selection. That question already been answered, choose another." + ANSI_RESET + System.lineSeparator();
+            return ANSI_YELLOW + "That question already been answered, choose another." + ANSI_RESET + System.lineSeparator();
         }
         return String.valueOf(promptQuestionAndAnswers(cell));
     }
@@ -87,20 +117,6 @@ public class Board {
             }
         }
         return null;
-    }
-
-    public String displayBoard() {
-        StringBuilder sb = new StringBuilder();
-        int counter = 1;
-        for (int row = 0; row < BOARD_SIZE; row++) {
-            for (int col = 0; col < BOARD_SIZE; col++) {
-                if (gameBoard[row][col] != null) {
-                    sb.append("Question ").append(counter).append(" ");
-                    counter++;
-                }
-            }
-        }
-        return String.valueOf(sb);
     }
 
     public String displayPrettyBoard() {
@@ -121,13 +137,14 @@ public class Board {
 
         for (int row = 0; row < BOARD_SIZE; row++) {
             for (int col = 0; col < BOARD_SIZE; col++) {
-                if (gameBoard[row][col] != null) {
+                if (gameBoard[row][col] != null && !gameBoard[row][col].question.isAnswered) {
                     format = "| Question " + ANSI_GREEN + "%-2d" + ANSI_RESET + " - %3s ";
                     prettyBoard.append(String.format(format, counter, gameBoard[row][col].question.questionValue));
                     counter++;
                 } else {
-                    format = "| " + ANSI_RED + "------------------ " + ANSI_RESET;
+                    format = "| " + ANSI_RED + "----------------- " + ANSI_RESET;
                     prettyBoard.append(String.format(format, counter, gameBoard[row][col].question.questionValue));
+                    counter++;
                 }
             }
             prettyBoard.append("|\n");
@@ -176,7 +193,8 @@ public class Board {
             String category = columns[1];
             String questionValue = columns[2];
             String questionText = columns[3];
-            return new Question(id, category, questionValue, questionText);
+            boolean isAnswered = Boolean.parseBoolean(columns[4]);
+            return new Question(id, category, questionValue, questionText, isAnswered);
         }, 1);
     }
 }
