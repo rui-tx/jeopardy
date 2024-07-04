@@ -10,7 +10,16 @@ import java.util.concurrent.Executors;
 
 import static com.mindera.mindswap.Constants.SOUNDS_FILE_PATH;
 
+/**
+ * Handler for the sound command.
+ */
 public class SoundHandler implements CommandHandler {
+
+    /**
+     * Executes the sound command by playing the specified sound.
+     *
+     * @param client the client on which the command will be executed
+     */
     @Override
     public void execute(Client client) {
         ExecutorService threads = Executors.newSingleThreadExecutor();
@@ -53,6 +62,11 @@ public class SoundHandler implements CommandHandler {
         }
     }
 
+    /**
+     * Plays the specified sound file.
+     *
+     * @param filePath the path to the sound file
+     */
     private void playSound(String filePath) {
         // Create an AudioInputStream object
         try (AudioInputStream audioStream = AudioSystem.getAudioInputStream(new File(filePath))) {
