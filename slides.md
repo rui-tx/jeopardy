@@ -4,13 +4,47 @@
 
 ## Jeopardy (like)
 
-<img src="https://static.wikia.nocookie.net/gameshows/images/0/03/Jeopardy%21_1984.JPG/revision/latest?cb=20231027004918" style="float: right"/>
+<img src="https://static.wikia.nocookie.net/gameshows/images/0/03/Jeopardy%21_1984.JPG/revision/latest?cb=20231027004918" style="float: center"/>
 
-### Our group
+--- 
 
-<!-- .slide: style="text-align: left;"> -->
-<i class="fab fa-github"></i><a href="https://github.com/nuntera">  github.com/nuntera</a>
-<i class="fab fa-github"></i><a href="https://github.com/rui-tx">  github.com/rui-tx</a>
+## About
 
+- Simple quiz game
+- Multiplayer
+
+---
+
+
+## The Game
+
+- Each round, a selected player chooses a question to answer
+- All the others respond to the same question
+- The fastest correct answer wins the round
+- Loops until no question are available
+
+---
+
+## Demo
+
+---
+
+## Code
+### Who wants to see mediocre code? Me!
+
+---
+
+## Things to do
+
+- Mulitple game sessions
+- Better player waiting system
+- Implement a buzzer
+
+---
+
+## Our group
+
+[Pedro](https://github.com/nuntera)
+[Rui](https://github.com/rui-tx)
 
 ---
