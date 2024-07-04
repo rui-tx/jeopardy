@@ -18,16 +18,34 @@ public class SoundHandler implements CommandHandler {
         if (client.getLastCommand() != null && client.getLastCommand()[0].equals("/sound")) {
             switch (client.getLastCommand()[1]) {
                 case "win":
-                    Thread win = new Thread(() -> {
+                    threads.submit(new Thread(() -> {
                         playSound(SOUNDS_FILE_PATH + "tada.wav");
-                    });
-                    threads.submit(win);
+                    }));
                     break;
                 case "lost":
-                    Thread lost = new Thread(() -> {
-                        playSound(SOUNDS_FILE_PATH + "laugh.wav");
-                    });
-                    threads.submit(lost);
+                    threads.submit(new Thread(() -> {
+                        playSound(SOUNDS_FILE_PATH + "lost.wav");
+                    }));
+                    break;
+                case "turn":
+                    threads.submit(new Thread(() -> {
+                        playSound(SOUNDS_FILE_PATH + "yourturn.wav");
+                    }));
+                    break;
+                case "roundwinner":
+                    threads.submit(new Thread(() -> {
+                        playSound(SOUNDS_FILE_PATH + "roundwinner.wav");
+                    }));
+                    break;
+                case "cue1":
+                    threads.submit(new Thread(() -> {
+                        playSound(SOUNDS_FILE_PATH + "cue1.wav");
+                    }));
+                    break;
+                case "intro":
+                    threads.submit(new Thread(() -> {
+                        playSound(SOUNDS_FILE_PATH + "intro.wav");
+                    }));
                     break;
                 default:
                     break;
