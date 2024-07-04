@@ -2,9 +2,9 @@
 
 ---
 
-## Jeopardy (like)
+## Jeopardy! (like)
 
-<img src="https://static.wikia.nocookie.net/gameshows/images/0/03/Jeopardy%21_1984.JPG/revision/latest?cb=20231027004918" style="float: center"/>
+![Jeopardy!](https://static.wikia.nocookie.net/gameshows/images/0/03/Jeopardy%21_1984.JPG/revision/latest?cb=20231027004918)
 
 --- 
 
@@ -14,7 +14,6 @@
 - Multiplayer
 
 ---
-
 
 ## The Game
 
@@ -29,8 +28,7 @@
 
 ---
 
-## Code
-### Who wants to see mediocre code? Me!
+## Who wants to see mediocre code?
 
 ---
 
@@ -46,5 +44,11 @@
 
 [Pedro](https://github.com/nuntera)
 [Rui](https://github.com/rui-tx)
+
+---
+
+## The end
+
+So long and thanks for all the fish.
 
 ---
