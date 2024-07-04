@@ -188,7 +188,8 @@ public class Server {
     private String gameTurn() {
         String winner = "No winner in this round";
         String fastestPlayer = "";
-        long lowestTime = 1_000_000;
+        long lowestTime = 1_000_000_000;
+        Set<ClientConnectionHandler> winners = new HashSet<>();
 
         // Select the current player to choose the question
         ClientConnectionHandler currentPlayer = selectPlayer();
@@ -209,20 +210,24 @@ public class Server {
             String answerResponse = board.checkAnswer(questionNumber, selectedAnswer);
             handler.send(answerResponse);
 
-            // Determine the winner based on the lowest response time
+            // Get the player with the lowest response time
             if (handler.getMessageTime() < lowestTime) {
                 lowestTime = handler.getMessageTime();
-                fastestPlayer = handler.getName();
             }
 
-            // check if the player won
+            // check if a player guessed correctly
             if (board.checkAnswerBool(questionNumber, selectedAnswer)) {
-                if (handler.getName().equals(fastestPlayer)) {
-                    handler.turnWon();
-                    handler.increaseScore(board.getQuestionValue(questionNumber));
-                    winner = handler.getName();
-                }
+                winners.add(handler);
             }
+        }
+
+        Optional<ClientConnectionHandler> roundWinner = winners.stream()
+                .min((a, b) -> Math.toIntExact(a.getMessageTime() - b.getMessageTime()));
+
+        if (roundWinner.isPresent()) {
+            roundWinner.get().turnWon();
+            roundWinner.get().increaseScore(board.getQuestionValue(questionNumber));
+            winner = roundWinner.get().getName();
         }
 
         // Lock all players again
@@ -242,7 +247,6 @@ public class Server {
         private long messageTime;
         private boolean gameTurn;
         private boolean hasPlayed;
-        private int questionNumber;
         private int turnsWon;
         private int score;
 
@@ -355,14 +359,6 @@ public class Server {
 
         public long getMessageTime() {
             return messageTime;
-        }
-
-        public int getQuestionNumber() {
-            return questionNumber;
-        }
-
-        public void setQuestionNumber(int questionNumber) {
-            this.questionNumber = questionNumber;
         }
 
         public int getTurnsWon() {
