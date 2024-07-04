@@ -13,6 +13,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static com.mindera.mindswap.Constants.BANNER;
+import static com.mindera.mindswap.utils.TerminalColors.*;
 
 public class Server {
 
@@ -118,10 +119,22 @@ public class Server {
 
             winner = gameTurn();
             broadcast("[server] Round winner: " + winner + " !");
-            broadcast("[server] Current score:");
-            clients.forEach(handler -> broadcast(handler.getName() + " has " + handler.getTurnsWon() + " wins" +
-                    " and " + handler.getScore() + "$"));
+            sendScoreboard();
         }
+    }
+
+    private void sendScoreboard() {
+        StringBuilder prettyScoreboard = new StringBuilder();
+        prettyScoreboard.append(ANSI_CYAN + " =========== SCOREBOARD ========== \n" + ANSI_RESET);
+        String fmt = ANSI_WHITE + "| %-18s | %-2s | %-4s | " + ANSI_RESET + "\n";
+        prettyScoreboard.append(String.format(fmt, "Player", "W", "Score"));
+        prettyScoreboard.append(ANSI_CYAN + " ================================= \n" + ANSI_RESET);
+        clients.forEach(handler -> {
+            String format = ANSI_PURPLE + "| %-18s | %-2s | %-4s  | " + ANSI_RESET + "\n";
+            prettyScoreboard.append(String.format(format, handler.getName(), handler.getTurnsWon(), handler.getScore()));
+        });
+        prettyScoreboard.append(ANSI_CYAN + " ================================= \n" + ANSI_RESET);
+        broadcast(prettyScoreboard.toString());
     }
 
     private Map<ClientConnectionHandler, Integer> collectAnswers() {
