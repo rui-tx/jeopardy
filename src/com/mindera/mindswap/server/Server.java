@@ -128,6 +128,7 @@ public class Server {
         for (ClientConnectionHandler handler : clients) {
             Thread answerThread = new Thread(() -> {
                 String input = handler.getAnswer();
+                handler.send("/lock");
                 String cleanedInput = input.replaceAll("\\s", ""); // Remove all white spaces
                 int selectedAnswer = Integer.parseInt(cleanedInput);
                 synchronized (playerAnswers) {
