@@ -12,6 +12,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static com.mindera.mindswap.Constants.BANNER;
+
 public class Server {
 
     private final int MAX_CLIENTS = 2;
@@ -353,6 +355,7 @@ public class Server {
             String welcomeMessage = "Welcome to the Jeopardy server!\n" +
                     "When enough players are connected, the game will start.";
             send(welcomeMessage);
+            send(BANNER);
             send("/sound intro");
         }
 
