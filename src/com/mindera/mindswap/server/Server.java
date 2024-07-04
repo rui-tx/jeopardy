@@ -146,6 +146,9 @@ public class Server {
                 handler.send("/sound cue1");
                 String input = handler.getAnswer();
                 handler.send("/lock");
+                if (input == null) {
+                    return;
+                }
                 String cleanedInput = input.replaceAll("\\s", ""); // Remove all white spaces
                 int selectedAnswer = Integer.parseInt(cleanedInput);
                 synchronized (playerAnswers) {
@@ -302,6 +305,10 @@ public class Server {
             } catch (NullPointerException e) {
                 System.out.println(e.getMessage());
                 removeClient(this);
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+                removeClient(this);
+                return null;
             }
 
             if (encodedMessage == null) {
