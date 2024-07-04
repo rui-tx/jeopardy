@@ -11,6 +11,7 @@ The idea is to select from a board a question that has a category associated wit
 
 - Online Multiplayer
 - Easy to add new questions and categories
+- Sounds
 - More to come...
 
 ## Authors
@@ -20,10 +21,10 @@ The idea is to select from a board a question that has a category associated wit
 
 ## Roadmap / TO-DO
 ### Server Side
-- [ ] Client handling
+- [x] Client handling
 - [ ] Waiting list
-- [ ] Grid / Matrix of questions
-- [ ] Questions database/files
+- [x] Grid / Matrix of questions
+- [x] Questions database/files
 
 ### Client Side
-- [ ] Calculate answer time
+- [x] Calculate answer time
