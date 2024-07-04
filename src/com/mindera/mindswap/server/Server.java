@@ -128,6 +128,7 @@ public class Server {
 
         for (ClientConnectionHandler handler : clients) {
             Thread answerThread = new Thread(() -> {
+                handler.send("/sound cue1");
                 String input = handler.getAnswer();
                 handler.send("/lock");
                 String cleanedInput = input.replaceAll("\\s", ""); // Remove all white spaces
@@ -164,6 +165,7 @@ public class Server {
     private int handleQuestionSelection(ClientConnectionHandler currentHandler) {
         currentHandler.send("/unlock");
         currentHandler.send("It's your turn!");
+        currentHandler.send("/sound turn");
 
         // Display the board and let the current player select a question
         currentHandler.send(board.displayPrettyBoard());
@@ -351,6 +353,7 @@ public class Server {
             String welcomeMessage = "Welcome to the Jeopardy server!\n" +
                     "When enough players are connected, the game will start.";
             send(welcomeMessage);
+            send("/sound intro");
         }
 
         public String getName() {
