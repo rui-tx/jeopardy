@@ -1,5 +1,6 @@
 package com.mindera.mindswap.server;
 
+import com.mindera.mindswap.Messages;
 import com.mindera.mindswap.board.Board;
 
 import java.io.BufferedWriter;
@@ -13,6 +14,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static com.mindera.mindswap.Constants.BANNER;
+import static com.mindera.mindswap.Constants.WELCOME_MESSAGE;
+import static com.mindera.mindswap.Messages.SERVER_STARTED;
 import static com.mindera.mindswap.utils.TerminalColors.*;
 
 public class Server {
@@ -45,16 +48,17 @@ public class Server {
         try {
             serverSocket = new ServerSocket(port);
             threads = Executors.newCachedThreadPool();
-            System.out.printf("Server started on port %d", port);
+            System.out.printf(SERVER_STARTED.toString(), port);
 
             // check if there are enough clients to start the game
             threads.submit(new Thread(() -> {
                 while (clients.size() < MAX_CLIENTS) {
                     try {
                         Thread.sleep(10000);
-                        System.out.println("Waiting for clients...");
+                        Messages.printMessage(Messages.SERVER_WAITING_FOR_PLAYERS);
                     } catch (InterruptedException e) {
-                        e.printStackTrace();
+                        Messages.printMessage(Messages.ERROR, e.getMessage());
+                        return;
                     }
                 }
                 //broadcast("[server] " + "Game will start in 10 seconds.");
@@ -65,7 +69,7 @@ public class Server {
                 acceptConnection();
             }
         } catch (IOException e) {
-            System.out.println("Error starting server");
+            Messages.printMessage(Messages.SERVER_ERROR_CREATING);
         }
     }
 
@@ -73,8 +77,7 @@ public class Server {
         Socket clientSocket = serverSocket.accept();
         if (clients.size() + 1 > MAX_CLIENTS) {
             BufferedWriter out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
-            String message = "Server is full, please try again later.";
-            out.write(message);
+            out.write(Messages.SERVER_FULL.toString());
             out.newLine();
             out.flush();
             out.close();
@@ -109,7 +112,7 @@ public class Server {
     }
 
     public void gameStart() {
-        clients.forEach(handler -> handler.send("Game started!"));
+        clients.forEach(handler -> handler.send(Messages.GAME_STARTED.toString()));
         this.gameStarted = true;
 
         String winner = "";
@@ -163,7 +166,8 @@ public class Server {
             try {
                 thread.join();
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                Messages.printMessage(Messages.ERROR, e.getMessage());
+                return null;
             }
         }
         return playerAnswers;
@@ -297,7 +301,7 @@ public class Server {
             String messageTime = "";
 
             try {
-                System.out.println("Waiting for answer...");
+                Messages.printMessage(Messages.SERVER_WAITING_FOR_MESSAGE);
 
                 encodedMessage = in.nextLine();
                 newMessage = encodedMessage.split(";")[0];
@@ -305,16 +309,16 @@ public class Server {
                 System.out.println("Answer received: " + newMessage + " at " + messageTime + "ms");
 
             } catch (NullPointerException e) {
-                System.out.println(e.getMessage());
+                System.out.println(Messages.ERROR + ": " + e.getMessage());
                 removeClient(this);
             } catch (Exception e) {
-                System.out.println(e.getMessage());
+                System.out.println(Messages.ERROR + ": " + e.getMessage());
                 removeClient(this);
                 return null;
             }
 
             if (encodedMessage == null) {
-                System.out.println("Client disconnected");
+                Messages.printMessage(Messages.CLIENT_DISCONNECTED);
                 removeClient(this);
             }
             this.message = newMessage;
@@ -360,7 +364,7 @@ public class Server {
                 }
 
             } catch (IOException e) {
-                System.out.println("Error sending message to client, removing it...");
+                Messages.printMessage(Messages.SERVER_ERROR_SENDING_MESSAGE);
                 removeClient(this);
             }
         }
@@ -369,14 +373,12 @@ public class Server {
             try {
                 clientSocket.close();
             } catch (IOException e) {
-                System.out.println("Error closing client");
+                Messages.printMessage(Messages.SERVER_ERROR_CLOSING_CLIENT);
             }
         }
 
         private void welcome() {
-            String welcomeMessage = "Welcome to the Jeopardy server!\n" +
-                    "When enough players are connected, the game will start.";
-            send(welcomeMessage);
+            send(WELCOME_MESSAGE);
             send(BANNER);
             send("/sound intro");
         }
