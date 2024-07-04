@@ -156,7 +156,7 @@ public class Client {
         /**
          * Constructs a new KeyboardHandler.
          *
-         * @param out The BufferedWriter to send messages to the server.
+         * @param out    The BufferedWriter to send messages to the server.
          * @param socket The client socket connected to the server.
          */
         public KeyboardHandler(BufferedWriter out, Socket socket) {
@@ -198,7 +198,7 @@ public class Client {
                     if (state == ClientState.QUESTIONING) {
                         String regex = "^(1[0-6]|[1-9])$";
                         String cleanedInput = input.replaceAll("\\s", ""); // Remove all white spaces
-                        if(!cleanedInput.matches(regex)) {
+                        if (!cleanedInput.matches(regex)) {
                             Messages.printMessage(Messages.BAD_QUESTION);
                             Messages.printMessage(Messages.SELECT_QUESTION);
                             continue;
@@ -208,7 +208,7 @@ public class Client {
                     if (state == ClientState.ANSWERING) {
                         String regex = "^([1-4])$";
                         String cleanedInput = input.replaceAll("\\s", ""); // Remove all white spaces
-                        if(!cleanedInput.matches(regex)) {
+                        if (!cleanedInput.matches(regex)) {
                             Messages.printMessage(Messages.BAD_ANSWER);
                             Messages.printMessage(Messages.SELECT_ANSWER);
                             continue;
@@ -262,7 +262,7 @@ public class Client {
          * @return The encoded message with the message time appended.
          */
         private String encodeMessage(String message) {
-            return message + ";" + messageTime;
+            return message.replace(";", "") + ";" + messageTime;
         }
     }
 }
