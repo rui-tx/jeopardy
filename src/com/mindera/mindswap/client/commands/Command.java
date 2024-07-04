@@ -6,6 +6,7 @@ public enum Command {
     QUIT("/quit", new QuitHandler()),
     TEST("/test", new TestHandler()),
     STATE("/state", new StateHandler()),
+    SOUND("/sound", new SoundHandler()),
 
     NOT_FOUND("Command not found", new CommandNotFoundHandler());
 
