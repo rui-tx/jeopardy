@@ -48,6 +48,11 @@ public class Board {
 
     }
 
+    public Integer getQuestionValue(int questionNumber) {
+        Cell cell = getCellByQuestionNumber(questionNumber);
+        return Integer.parseInt(cell.question.questionValue.substring(1));
+    }
+
     private StringBuilder promptQuestionAndAnswers(Cell cell) {
         StringBuilder sb = new StringBuilder();
 
