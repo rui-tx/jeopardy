@@ -178,24 +178,6 @@ public class Server {
         return questionNumber;
     }
 
-    /*
-    private ClientConnectionHandler resetAndGetPlayer() {
-        clients.forEach(c -> c.hasPlayed = false);
-        return clients.getFirst();
-    }
-
-    private ClientConnectionHandler selectPlayer() {
-        for (ClientConnectionHandler handler : clients) {
-            if (!handler.hasPlayed) {
-                handler.hasPlayed = true;
-                return handler;
-            }
-        }
-        // no player has played yet, reset and return the first player
-        return resetAndGetPlayer();
-    }
-     */
-
     private ClientConnectionHandler selectPlayer() {
         ClientConnectionHandler currentPlayer = clients.get(currentPlayerIndex);
         currentPlayerIndex = (currentPlayerIndex + 1) % clients.size();
@@ -206,7 +188,6 @@ public class Server {
         String winner = "No winner in this round";
         String fastestPlayer = "";
         long lowestTime = 1_000_000;
-
 
         // Select the current player to choose the question
         ClientConnectionHandler currentPlayer = selectPlayer();
@@ -241,7 +222,6 @@ public class Server {
                 }
             }
         }
-
 
         // Lock all players again
         broadcast("/lock");
