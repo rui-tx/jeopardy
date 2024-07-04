@@ -10,6 +10,10 @@ public class Constants {
             File.separator + "mindswap" + File.separator + "resources" + File.separator +
             "sounds" + File.separator;
 
+    public static final String WELCOME_MESSAGE =
+            "Welcome to the Jeopardy server!\n" +
+                    "When enough players are connected, the game will start.";
+
     public static final String BANNER =
             "   _                                _       " + "\n" +
                     "  (_)                              | |      " + "\n" +
