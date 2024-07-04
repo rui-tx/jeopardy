@@ -57,7 +57,7 @@ public class Server {
                         e.printStackTrace();
                     }
                 }
-                broadcast("[server] " + "Game will start in 10 seconds.");
+                //broadcast("[server] " + "Game will start in 10 seconds.");
                 gameStart();
             }));
 
@@ -118,7 +118,7 @@ public class Server {
             //getQuestionNumber(handler);
 
             winner = gameTurn();
-            broadcast("[server] Round winner: " + winner + " !");
+            broadcast(ANSI_PURPLE + "=== Round Winner === -> " + ANSI_RESET + ANSI_GREEN + winner + ANSI_RESET);
             sendScoreboard();
         }
     }
@@ -172,7 +172,8 @@ public class Server {
     private void broadcastQuestionAndAnswers(int questionNumber, ClientConnectionHandler currentHandler) {
         // Broadcast the selected question to all players
         String questionResponse = board.selectQuestion(questionNumber);
-        broadcast("Question selected by " + currentHandler.getName() + " for " + questionResponse);
+        broadcast("\nQuestion selected by " + ANSI_GREEN + currentHandler.getName() + ANSI_RESET);
+        broadcast("Value: " + questionResponse + "\n");
 
         // Notify all players to select an answer
         broadcast("/unlock");
@@ -181,8 +182,9 @@ public class Server {
     }
 
     private int handleQuestionSelection(ClientConnectionHandler currentHandler) {
+        broadcast(ANSI_WHITE + currentHandler.getName() + " is selecting a question, please wait..." + ANSI_RESET);
         currentHandler.send("/unlock");
-        currentHandler.send("It's your turn!");
+        currentHandler.send(ANSI_GREEN + "It's your turn!" + ANSI_RESET);
         currentHandler.send("/sound turn");
 
         // Display the board and let the current player select a question
