@@ -34,11 +34,10 @@ public class Server {
         clients = new CopyOnWriteArrayList<>();
         this.port = port;
         this.gameStarted = false;
-        // Additions
         board = new Board();
         currentPlayerIndex = 0;
-
     }
+
 
     public void start() {
         this.start(this.port);
@@ -94,19 +93,6 @@ public class Server {
         //cHandler.send(cHandler.getName());
     }
 
-    public void broadcast(String name, String message, boolean includeName) {
-        clients.stream()
-                .filter(handler -> !handler.getName().equals(name))
-                .forEach(handler -> {
-                    if (includeName) {
-                        handler.send(name + ": " + message);
-                    } else {
-                        handler.send(message);
-                    }
-                });
-    }
-
-    // Overloaded broadcast method for convenience´
     public void broadcast(String message) {
         clients.forEach(handler -> handler.send(message));
     }
@@ -116,14 +102,15 @@ public class Server {
         this.gameStarted = true;
 
         String winner = "";
-        while (true) {
-            //ClientConnectionHandler handler = selectPlayer();
-            //getQuestionNumber(handler);
-
+        while (!board.isGameOver()) {
             winner = gameTurn();
             broadcast(ANSI_PURPLE + "=== Round Winner === -> " + ANSI_RESET + ANSI_GREEN + winner + ANSI_RESET);
             sendScoreboard();
         }
+        // Final broadcast of scores when the game is over
+        broadcast("[server] Final scores:");
+        clients.forEach(handler -> broadcast(handler.getName() + " has " + handler.getTurnsWon() + " wins" +
+                " and " + handler.getScore() + "$"));
     }
 
     private void sendScoreboard() {
@@ -196,12 +183,20 @@ public class Server {
         currentHandler.send("Select a question number (1-16):");
         currentHandler.send("/state question");
 
-        String input = currentHandler.getAnswer();
-        String cleanedInput = input.replaceAll("\\s", ""); // Remove all white spaces
+        int questionNumber;
+        while (true) {
+            String input = currentHandler.getAnswer();
+            String cleanedInput = input.replaceAll("\\s", ""); // Remove all white spaces
+            questionNumber = Integer.parseInt(cleanedInput);
 
-        int questionNumber = Integer.parseInt(cleanedInput);
-
+            if (board.processQuestionBoolean(questionNumber, false)) {
+                currentHandler.send("That question already been answered, choose another.");
+            } else {
+                break;
+            }
+        }
         currentHandler.send("/lock");
+
         return questionNumber;
     }
 
@@ -233,7 +228,7 @@ public class Server {
         for (Map.Entry<ClientConnectionHandler, Integer> entry : playerAnswers.entrySet()) {
             ClientConnectionHandler handler = entry.getKey();
             int selectedAnswer = entry.getValue();
-            String answerResponse = board.checkAnswer(questionNumber, selectedAnswer);
+            String answerResponse = board.validateAnswer(questionNumber, selectedAnswer);
             handler.send(answerResponse);
 
             // Get the player with the lowest response time
@@ -258,6 +253,9 @@ public class Server {
 
         // Lock all players again
         broadcast("/lock");
+
+        // Change question isAnswered to true
+        board.processQuestionBoolean(questionNumber, true);
 
         return winner;
     }

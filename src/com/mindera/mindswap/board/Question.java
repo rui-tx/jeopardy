@@ -6,13 +6,14 @@ public class Question {
     String category;
     String questionValue;
     String questionText;
+    boolean isAnswered;
 
-
-    public Question(String id, String category, String questionValue, String questionText) {
+    public Question(String id, String category, String questionValue, String questionText, boolean isAnswered) {
         this.id = id;
         this.category = category;
         this.questionValue = questionValue;
         this.questionText = questionText;
+        this.isAnswered = isAnswered;
     }
 
     @Override
@@ -22,6 +23,7 @@ public class Question {
                 ", category='" + category + '\'' +
                 ", questionValue='" + questionValue + '\'' +
                 ", questionText='" + questionText + '\'' +
+                ", isAnswered=" + isAnswered +
                 '}';
     }
 }
