@@ -1,4 +1,4 @@
-# Jeopardike (working title)
+# Jeopardike
 
 Jeopardike is a project made by Pedro and Rui for Mindera MindSwap Bootcamp.
 
