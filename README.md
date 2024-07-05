@@ -22,13 +22,14 @@ The idea is to select from a board a question that has a category associated wit
 ## Roadmap / TO-DO
 ### Server Side
 - [x] Client handling
-- [ ] Waiting list
+- [x] Waiting list (partial)
 - [x] Grid / Matrix of questions
 - [x] Questions database/files
 - [x] Game ending
 - [ ] Game restarting after game is over
 - [ ] Game restarting after player disconnect
 - [ ] Multiple game sessions
+- [ ] Better waiting list
 
 ### Client Side
 - [x] Calculate answer time
