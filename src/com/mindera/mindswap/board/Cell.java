@@ -12,6 +12,12 @@ public class Cell {
         this.answers = answers;
     }
 
+    /**
+     * Create a new cell with the given question and answers - factory method
+     * @param question
+     * @param answers
+     * @return
+     */
     public static Cell createCell(Question question, List<Answer> answers) {
         return new Cell(question, answers);
     }

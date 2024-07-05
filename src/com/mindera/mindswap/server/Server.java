@@ -18,8 +18,8 @@ import static com.mindera.mindswap.Constants.WELCOME_MESSAGE;
 import static com.mindera.mindswap.Messages.SERVER_STARTED;
 import static com.mindera.mindswap.utils.TerminalColors.*;
 
-public class Server {
 
+public class Server {
     private final int MAX_CLIENTS = 2;
     private final List<ClientConnectionHandler> clients;
     private ServerSocket serverSocket;
@@ -28,7 +28,6 @@ public class Server {
     private boolean gameStarted;
     private Board board;
     private int currentPlayerIndex;
-
 
     public Server(int port) {
         clients = new CopyOnWriteArrayList<>();
@@ -83,14 +82,12 @@ public class Server {
             clientSocket.close();
             return;
         }
-
         ClientConnectionHandler clientConnectionHandler = new ClientConnectionHandler(clientSocket, "");
         threads.submit(clientConnectionHandler);
     }
 
     private void addClient(ClientConnectionHandler cHandler) {
         clients.add(cHandler);
-        //cHandler.send(cHandler.getName());
     }
 
     public void broadcast(String message) {
@@ -283,6 +280,7 @@ public class Server {
             this.hasPlayed = false;
         }
 
+
         @Override
         public void run() {
             addClient(this);
@@ -331,16 +329,6 @@ public class Server {
                     out.newLine();
                     out.flush();
                     name = getAnswer();
-
-                    /*
-                    boolean isNameTaken = clients.stream()
-                            .anyMatch(client -> client.getName().equals(newName));
-                    if (isNameTaken) {
-                        out.write("Name already taken. Please enter a different name");
-                        out.flush();
-                    }
-                    nameValid = true;
-                     */
 
                 } catch (IOException e) {
                     throw new RuntimeException(e);
