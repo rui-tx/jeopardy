@@ -1,6 +1,6 @@
 # Project1
 
-## Mindera Mindswap
+## Mindera MindSwap
 
 ---
 
