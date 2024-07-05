@@ -95,6 +95,16 @@ public class Server {
     }
 
     public void gameStart() {
+
+        while (!clients.stream().allMatch(ClientConnectionHandler::isReady)) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                Messages.printMessage(Messages.ERROR, e.getMessage());
+                return;
+            }
+        }
+
         clients.forEach(handler -> handler.send(Messages.GAME_STARTED.toString()));
         this.gameStarted = true;
 
@@ -270,6 +280,7 @@ public class Server {
         private boolean hasPlayed;
         private int turnsWon;
         private int score;
+        private boolean isReady;
 
         public ClientConnectionHandler(Socket clientSocket, String name) throws IOException {
             this.clientSocket = clientSocket;
@@ -278,6 +289,7 @@ public class Server {
             this.in = new Scanner(clientSocket.getInputStream());
             this.gameTurn = false;
             this.hasPlayed = false;
+            this.isReady = false;
         }
 
 
@@ -287,6 +299,7 @@ public class Server {
             changeName();
             welcome();
             send("/lock");
+            setReady(true);
 
             broadcast("[server] " + this.getName() + " connected");
         }
@@ -391,6 +404,14 @@ public class Server {
 
         public void increaseScore(int points) {
             score += points;
+        }
+
+        public boolean isReady() {
+            return isReady;
+        }
+
+        public void setReady(boolean ready) {
+            isReady = ready;
         }
     }
 }
