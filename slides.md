@@ -49,7 +49,6 @@ There were at least a couple of flaws/bugs/missing features with the game
 ## Things to do
 
 - Multiple game sessions
-- Better player waiting system
 - Restart the game without a server restart
 - Better answered question check system
 - Implement a buzzer
