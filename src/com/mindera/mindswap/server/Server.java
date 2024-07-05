@@ -1,5 +1,6 @@
 package com.mindera.mindswap.server;
 
+import com.mindera.mindswap.Constants;
 import com.mindera.mindswap.Messages;
 import com.mindera.mindswap.board.Board;
 
@@ -115,9 +116,29 @@ public class Server {
             sendScoreboard();
         }
         // Final broadcast of scores when the game is over
-        broadcast("[server] Final scores:");
-        clients.forEach(handler -> broadcast(handler.getName() + " has " + handler.getTurnsWon() + " wins" +
-                " and " + handler.getScore() + "$"));
+        finalScoreboard();
+        clients.forEach(ClientConnectionHandler::close);
+        clients.clear();
+    }
+
+    private void finalScoreboard() {
+        broadcast(ANSI_CYAN + " FINAL SCORES \n" + ANSI_RESET);
+        sendScoreboard();
+        ClientConnectionHandler winner = clients.stream()
+                .max(Comparator.comparing(ClientConnectionHandler::getScore)).get();
+
+        broadcast("Winner: " + ANSI_GREEN + winner.getName() + ANSI_RESET +
+                " with " + ANSI_PURPLE + winner.getScore()  + "$" + ANSI_RESET);
+
+        winner.send(Constants.WON);
+        winner.send("/sound win");
+
+        clients.forEach(handler -> {
+            if (!handler.getName().equals(winner.getName())) {
+                handler.send(Constants.LOST);
+                handler.send("/sound lost");
+            }
+        });
     }
 
     private void sendScoreboard() {
