@@ -11,9 +11,9 @@
 
 ---
 
-## Jeopardy! (like)
+## Jeopardike
 
-Our game is inspired by the game show [Jeopardy!](https://static.wikia.nocookie.net/gameshows/images/0/03/Jeopardy%21_1984.JPG/revision/latest?cb=20231027004918)
+Our game is inspired (and *like*) by the game show [Jeopardy!](https://static.wikia.nocookie.net/gameshows/images/0/03/Jeopardy%21_1984.JPG/revision/latest?cb=20231027004918)
 
 - Simple quiz game
 - Has multiple categories ranging from easy to difficult
