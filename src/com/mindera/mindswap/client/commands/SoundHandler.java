@@ -28,12 +28,12 @@ public class SoundHandler implements CommandHandler {
             switch (client.getLastCommand()[1]) {
                 case "win":
                     threads.submit(new Thread(() -> {
-                        playSound(SOUNDS_FILE_PATH + "tada.wav");
+                        playSound(SOUNDS_FILE_PATH + "roundwinner.wav");
                     }));
                     break;
                 case "lost":
                     threads.submit(new Thread(() -> {
-                        playSound(SOUNDS_FILE_PATH + "lost.wav");
+                        playSound(SOUNDS_FILE_PATH + "laugh.wav");
                     }));
                     break;
                 case "turn":
@@ -43,7 +43,7 @@ public class SoundHandler implements CommandHandler {
                     break;
                 case "roundwinner":
                     threads.submit(new Thread(() -> {
-                        playSound(SOUNDS_FILE_PATH + "roundwinner.wav");
+                        playSound(SOUNDS_FILE_PATH + "tada.wav");
                     }));
                     break;
                 case "cue1":
