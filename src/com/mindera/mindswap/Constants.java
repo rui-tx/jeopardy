@@ -39,4 +39,7 @@ public class Constants {
                     " \\ V / _ \\| | | | | |   / _ \\/ __| __| |\n" +
                     "  | | (_) | |_| | | |__| (_) \\__ \\ |_|_|\n" +
                     "  |_|\\___/ \\__,_| |_____\\___/|___/\\__(_)\n";
+
+    private Constants() {// Prevent instantiation
+    }
 }
