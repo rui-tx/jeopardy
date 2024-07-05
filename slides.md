@@ -2,17 +2,23 @@
 
 ---
 
+## Our group
+
+[Pedro](https://github.com/nuntera)  
+[Rui](https://github.com/rui-tx)
+
+---
+
 ## Jeopardy! (like)
 
-Inspired by
-![Jeopardy!](https://static.wikia.nocookie.net/gameshows/images/0/03/Jeopardy%21_1984.JPG/revision/latest?cb=20231027004918)
-<!-- .element height="50%" width="50%" -->
+Our game is inspired by the game show [Jeopardy!](https://static.wikia.nocookie.net/gameshows/images/0/03/Jeopardy%21_1984.JPG/revision/latest?cb=20231027004918)
 
 --- 
 
 ## About
 
 - Simple quiz game
+- Has multiple categories ranging from easy to difficult
 - Multiplayer
 
 ---
@@ -22,7 +28,7 @@ Inspired by
 - Each round, a selected player chooses a question to answer
 - All the others respond to the same question
 - The fastest correct answer wins the round
-- Loops until no question are available
+- Loops until no questions are available
 
 ---
 
@@ -32,7 +38,7 @@ Inspired by
 
 ## Spot the Bug
 
-There were atleast a couple of flaws/bugs/missing features with the game
+There were at least a couple of flaws/bugs/missing features with the game
 
 ### Did you spot them all?
 
@@ -44,18 +50,14 @@ There were atleast a couple of flaws/bugs/missing features with the game
 
 ## Things to do
 
-- Mulitple game sessions
+- Multiple game sessions
 - Better player waiting system
 - Restart the game without a server restart
 - Better answered question check system
 - Implement a buzzer
 
----
 
-## Our group
-
-[Pedro](https://github.com/nuntera)
-[Rui](https://github.com/rui-tx)
+## Q&A
 
 ---
 
