@@ -25,11 +25,14 @@ The idea is to select from a board a question that has a category associated wit
 - [ ] Waiting list
 - [x] Grid / Matrix of questions
 - [x] Questions database/files
-- [ ] Game ending
+- [x] Game ending
 - [ ] Game restarting after game is over
 - [ ] Game restarting after player disconnect
 - [ ] Multiple game sessions
 
 ### Client Side
 - [x] Calculate answer time
+
+## Slides
+[Click here](https://rui-tx.github.io/jeopardy/) to see the presentation slides
       
