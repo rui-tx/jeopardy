@@ -6,6 +6,9 @@ import com.mindera.mindswap.client.commands.Command;
 import java.io.*;
 import java.net.Socket;
 
+/**
+ * Client class for the Jeopardy game.
+ */
 public class Client {
 
     private Socket socket;
@@ -133,14 +136,19 @@ public class Client {
     }
 
     /**
-     * Set client state
+     * Sets the client's state.
      *
-     * @param clientState
+     * @param clientState the client's state
      */
     public void setState(ClientState clientState) {
         this.state = clientState;
     }
 
+    /**
+     * Gets the last command sent by the client.
+     *
+     * @return the last command sent by the client
+     */
     public String[] getLastCommand() {
         return lastCommand;
     }
@@ -156,7 +164,7 @@ public class Client {
         /**
          * Constructs a new KeyboardHandler.
          *
-         * @param out The BufferedWriter to send messages to the server.
+         * @param out    The BufferedWriter to send messages to the server.
          * @param socket The client socket connected to the server.
          */
         public KeyboardHandler(BufferedWriter out, Socket socket) {
@@ -176,13 +184,6 @@ public class Client {
 
                     String input = in.readLine();
 
-
-                    // just testing ascii art
-                    if (input.equals(Command.TEST.getDescription())) {
-                        runCommand(Command.TEST.getDescription());
-                        continue;
-                    }
-
                     // If the user types "/quit", quit the application
                     // TODO: Something feels wrong here...
                     if (input.equals(Command.QUIT.getDescription())) {
@@ -195,20 +196,24 @@ public class Client {
                         continue;
                     }
 
+                    // Set the state to questioning
+                    // If the client is in questioning state, check if the input is a valid question number
                     if (state == ClientState.QUESTIONING) {
                         String regex = "^(1[0-6]|[1-9])$";
                         String cleanedInput = input.replaceAll("\\s", ""); // Remove all white spaces
-                        if(!cleanedInput.matches(regex)) {
+                        if (!cleanedInput.matches(regex)) {
                             Messages.printMessage(Messages.BAD_QUESTION);
                             Messages.printMessage(Messages.SELECT_QUESTION);
                             continue;
                         }
                     }
 
+                    // Set the state to answering
+                    // If the client is in answering state, check if the input is a valid answer number
                     if (state == ClientState.ANSWERING) {
                         String regex = "^([1-4])$";
                         String cleanedInput = input.replaceAll("\\s", ""); // Remove all white spaces
-                        if(!cleanedInput.matches(regex)) {
+                        if (!cleanedInput.matches(regex)) {
                             Messages.printMessage(Messages.BAD_ANSWER);
                             Messages.printMessage(Messages.SELECT_ANSWER);
                             continue;
@@ -232,7 +237,6 @@ public class Client {
                 }
             }
         }
-
 
         /**
          * Sends a message to the server after encoding it.
@@ -262,7 +266,7 @@ public class Client {
          * @return The encoded message with the message time appended.
          */
         private String encodeMessage(String message) {
-            return message + ";" + messageTime;
+            return message.replace(";", "") + ";" + messageTime;
         }
     }
 }

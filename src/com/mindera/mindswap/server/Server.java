@@ -1,5 +1,6 @@
 package com.mindera.mindswap.server;
 
+import com.mindera.mindswap.Messages;
 import com.mindera.mindswap.board.Board;
 
 import java.io.BufferedWriter;
@@ -11,6 +12,11 @@ import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import static com.mindera.mindswap.Constants.BANNER;
+import static com.mindera.mindswap.Constants.WELCOME_MESSAGE;
+import static com.mindera.mindswap.Messages.SERVER_STARTED;
+import static com.mindera.mindswap.utils.TerminalColors.*;
 
 public class Server {
 
@@ -41,19 +47,20 @@ public class Server {
         try {
             serverSocket = new ServerSocket(port);
             threads = Executors.newCachedThreadPool();
-            System.out.printf("Server started on port %d", port);
+            System.out.printf(SERVER_STARTED.toString(), port);
 
             // check if there are enough clients to start the game
             threads.submit(new Thread(() -> {
                 while (clients.size() < MAX_CLIENTS) {
                     try {
                         Thread.sleep(10000);
-                        System.out.println("Waiting for clients...");
+                        Messages.printMessage(Messages.SERVER_WAITING_FOR_PLAYERS);
                     } catch (InterruptedException e) {
-                        e.printStackTrace();
+                        Messages.printMessage(Messages.ERROR, e.getMessage());
+                        return;
                     }
                 }
-                broadcast("[server] " + "Game will start in 10 seconds.");
+                //broadcast("[server] " + "Game will start in 10 seconds.");
                 gameStart();
             }));
 
@@ -61,7 +68,7 @@ public class Server {
                 acceptConnection();
             }
         } catch (IOException e) {
-            System.out.println("Error starting server");
+            Messages.printMessage(Messages.SERVER_ERROR_CREATING);
         }
     }
 
@@ -69,8 +76,7 @@ public class Server {
         Socket clientSocket = serverSocket.accept();
         if (clients.size() + 1 > MAX_CLIENTS) {
             BufferedWriter out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
-            String message = "Server is full, please try again later.";
-            out.write(message);
+            out.write(Messages.SERVER_FULL.toString());
             out.newLine();
             out.flush();
             out.close();
@@ -92,21 +98,33 @@ public class Server {
     }
 
     public void gameStart() {
-        clients.forEach(handler -> handler.send("Game started!"));
+        clients.forEach(handler -> handler.send(Messages.GAME_STARTED.toString()));
         this.gameStarted = true;
 
         String winner = "";
         while (!board.isGameOver()) {
             winner = gameTurn();
-            broadcast("[server] Round winner: " + winner + " !");
-            broadcast("[server] Current score:");
-            clients.forEach(handler -> broadcast(handler.getName() + " has " + handler.getTurnsWon() + " wins" +
-                    " and " + handler.getScore() + "$"));
+            broadcast(ANSI_PURPLE + "=== Round Winner === -> " + ANSI_RESET + ANSI_GREEN + winner + ANSI_RESET);
+            sendScoreboard();
         }
         // Final broadcast of scores when the game is over
         broadcast("[server] Final scores:");
         clients.forEach(handler -> broadcast(handler.getName() + " has " + handler.getTurnsWon() + " wins" +
                 " and " + handler.getScore() + "$"));
+    }
+
+    private void sendScoreboard() {
+        StringBuilder prettyScoreboard = new StringBuilder();
+        prettyScoreboard.append(ANSI_CYAN + " =========== SCOREBOARD ========== \n" + ANSI_RESET);
+        String fmt = ANSI_WHITE + "| %-18s | %-2s | %-4s | " + ANSI_RESET + "\n";
+        prettyScoreboard.append(String.format(fmt, "Player", "W", "Score"));
+        prettyScoreboard.append(ANSI_CYAN + " ================================= \n" + ANSI_RESET);
+        clients.forEach(handler -> {
+            String format = ANSI_PURPLE + "| %-18s | %-2s | %-4s  | " + ANSI_RESET + "\n";
+            prettyScoreboard.append(String.format(format, handler.getName(), handler.getTurnsWon(), handler.getScore()));
+        });
+        prettyScoreboard.append(ANSI_CYAN + " ================================= \n" + ANSI_RESET);
+        broadcast(prettyScoreboard.toString());
     }
 
     private Map<ClientConnectionHandler, Integer> collectAnswers() {
@@ -115,8 +133,12 @@ public class Server {
 
         for (ClientConnectionHandler handler : clients) {
             Thread answerThread = new Thread(() -> {
+                handler.send("/sound cue1");
                 String input = handler.getAnswer();
                 handler.send("/lock");
+                if (input == null) {
+                    return;
+                }
                 String cleanedInput = input.replaceAll("\\s", ""); // Remove all white spaces
                 int selectedAnswer = Integer.parseInt(cleanedInput);
                 synchronized (playerAnswers) {
@@ -131,7 +153,8 @@ public class Server {
             try {
                 thread.join();
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                Messages.printMessage(Messages.ERROR, e.getMessage());
+                return null;
             }
         }
         return playerAnswers;
@@ -140,7 +163,8 @@ public class Server {
     private void broadcastQuestionAndAnswers(int questionNumber, ClientConnectionHandler currentHandler) {
         // Broadcast the selected question to all players
         String questionResponse = board.selectQuestion(questionNumber);
-        broadcast("Question selected by " + currentHandler.getName() + " for " + questionResponse);
+        broadcast("\nQuestion selected by " + ANSI_GREEN + currentHandler.getName() + ANSI_RESET);
+        broadcast("Value: " + questionResponse + "\n");
 
         // Notify all players to select an answer
         broadcast("/unlock");
@@ -149,8 +173,10 @@ public class Server {
     }
 
     private int handleQuestionSelection(ClientConnectionHandler currentHandler) {
+        broadcast(ANSI_WHITE + currentHandler.getName() + " is selecting a question, please wait..." + ANSI_RESET);
         currentHandler.send("/unlock");
-        currentHandler.send("It's your turn!");
+        currentHandler.send(ANSI_GREEN + "It's your turn!" + ANSI_RESET);
+        currentHandler.send("/sound turn");
 
         // Display the board and let the current player select a question
         currentHandler.send(board.displayPrettyBoard());
@@ -183,7 +209,8 @@ public class Server {
     private String gameTurn() {
         String winner = "No winner in this round";
         String fastestPlayer = "";
-        long lowestTime = 1_000_000;
+        long lowestTime = 1_000_000_000;
+        Set<ClientConnectionHandler> winners = new HashSet<>();
 
         // Select the current player to choose the question
         ClientConnectionHandler currentPlayer = selectPlayer();
@@ -204,21 +231,26 @@ public class Server {
             String answerResponse = board.validateAnswer(questionNumber, selectedAnswer);
             handler.send(answerResponse);
 
-            // Determine the winner based on the lowest response time
+            // Get the player with the lowest response time
             if (handler.getMessageTime() < lowestTime) {
                 lowestTime = handler.getMessageTime();
-                fastestPlayer = handler.getName();
             }
 
-            // check if the player won
+            // check if a player guessed correctly
             if (board.checkAnswerBool(questionNumber, selectedAnswer)) {
-                if (handler.getName().equals(fastestPlayer)) {
-                    handler.turnWon();
-                    handler.increaseScore(board.getQuestionValue(questionNumber));
-                    winner = handler.getName();
-                }
+                winners.add(handler);
             }
         }
+
+        Optional<ClientConnectionHandler> roundWinner = winners.stream()
+                .min((a, b) -> Math.toIntExact(a.getMessageTime() - b.getMessageTime()));
+
+        if (roundWinner.isPresent()) {
+            roundWinner.get().turnWon();
+            roundWinner.get().increaseScore(board.getQuestionValue(questionNumber));
+            winner = roundWinner.get().getName();
+        }
+
         // Lock all players again
         broadcast("/lock");
 
@@ -239,7 +271,6 @@ public class Server {
         private long messageTime;
         private boolean gameTurn;
         private boolean hasPlayed;
-        private int questionNumber;
         private int turnsWon;
         private int score;
 
@@ -268,7 +299,7 @@ public class Server {
             String messageTime = "";
 
             try {
-                System.out.println("Waiting for answer...");
+                Messages.printMessage(Messages.SERVER_WAITING_FOR_MESSAGE);
 
                 encodedMessage = in.nextLine();
                 newMessage = encodedMessage.split(";")[0];
@@ -276,12 +307,16 @@ public class Server {
                 System.out.println("Answer received: " + newMessage + " at " + messageTime + "ms");
 
             } catch (NullPointerException e) {
-                System.out.println(e.getMessage());
+                System.out.println(Messages.ERROR + ": " + e.getMessage());
                 removeClient(this);
+            } catch (Exception e) {
+                System.out.println(Messages.ERROR + ": " + e.getMessage());
+                removeClient(this);
+                return null;
             }
 
             if (encodedMessage == null) {
-                System.out.println("Client disconnected");
+                Messages.printMessage(Messages.CLIENT_DISCONNECTED);
                 removeClient(this);
             }
             this.message = newMessage;
@@ -327,7 +362,7 @@ public class Server {
                 }
 
             } catch (IOException e) {
-                System.out.println("Error sending message to client, removing it...");
+                Messages.printMessage(Messages.SERVER_ERROR_SENDING_MESSAGE);
                 removeClient(this);
             }
         }
@@ -336,14 +371,14 @@ public class Server {
             try {
                 clientSocket.close();
             } catch (IOException e) {
-                System.out.println("Error closing client");
+                Messages.printMessage(Messages.SERVER_ERROR_CLOSING_CLIENT);
             }
         }
 
         private void welcome() {
-            String welcomeMessage = "Welcome to the Jeopardy server!\n" +
-                    "When enough players are connected, the game will start.";
-            send(welcomeMessage);
+            send(WELCOME_MESSAGE);
+            send(BANNER);
+            send("/sound intro");
         }
 
         public String getName() {
@@ -352,14 +387,6 @@ public class Server {
 
         public long getMessageTime() {
             return messageTime;
-        }
-
-        public int getQuestionNumber() {
-            return questionNumber;
-        }
-
-        public void setQuestionNumber(int questionNumber) {
-            this.questionNumber = questionNumber;
         }
 
         public int getTurnsWon() {
