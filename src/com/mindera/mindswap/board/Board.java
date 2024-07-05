@@ -15,6 +15,10 @@ import static com.mindera.mindswap.utils.TerminalColors.*;
 public class Board {
     private final Cell[][] gameBoard;
 
+    /**
+     * Create a new board
+     * csv files are read and the questions and answers are populated into the board
+     */
     public Board() {
         gameBoard = new Cell[BOARD_SIZE][BOARD_SIZE];
         Map<String, ArrayList<Question>> questionsByCategory = getQuestions();
@@ -22,7 +26,10 @@ public class Board {
         populateBoardWithQuestionsAndAnswers(questionsByCategory, answersById);
     }
 
-
+    /**
+     * Check if the game is over
+     * @return true if the game is over
+     */
     public boolean isGameOver() {
         int totalQuestions = BOARD_SIZE * BOARD_SIZE;
         int answeredQuestions = 0;
@@ -37,6 +44,12 @@ public class Board {
         return answeredQuestions == totalQuestions;
     }
 
+    /**
+     * Check if the answer is correct
+     * @param questionNumber the question number
+     * @param selectedAnswer the selected answer
+     * @return true if the answer is correct or false otherwise
+     */
     public boolean checkAnswerBool(int questionNumber, int selectedAnswer) {
         Cell cell = getCellByQuestionNumber(questionNumber);
         if (selectedAnswer <= 0 || selectedAnswer > cell.answers.size()) {
@@ -46,6 +59,12 @@ public class Board {
         return answer.isCorrect;
     }
 
+    /**
+     * Validate the answer
+     * @param questionNumber the question number
+     * @param selectedAnswer the selected answer
+     * @return a string with the validation result
+     */
     public String validateAnswer(int questionNumber, int selectedAnswer) {
         Cell cell = getCellByQuestionNumber(questionNumber);
 
@@ -60,6 +79,12 @@ public class Board {
         }
     }
 
+    /**
+     * Process the question
+     * @param questionNumber the question number
+     * @param markAsAnswered true if the question should be marked as answered
+     * @return true if the question was processed successfully
+     */
     public boolean processQuestionBoolean(int questionNumber, boolean markAsAnswered) {
         int counter = 1;
         for (int row = 0; row < BOARD_SIZE; row++) {
@@ -78,11 +103,21 @@ public class Board {
         return false;
     }
 
+    /**
+     * Get the question value
+     * @param questionNumber the question number
+     * @return the question value
+     */
     public Integer getQuestionValue(int questionNumber) {
         Cell cell = getCellByQuestionNumber(questionNumber);
         return Integer.parseInt(cell.question.questionValue);
     }
 
+    /**
+     * Prompt the user to select an answer
+     * @param cell the cell
+     * @return a string with the prompt
+     */
     private StringBuilder promptQuestionAndAnswers(Cell cell) {
         StringBuilder sb = new StringBuilder();
 
@@ -96,6 +131,11 @@ public class Board {
         return sb;
     }
 
+    /**
+     * Select a question
+     * @param questionNumber the question number
+     * @return a string with the question
+     */
     public String selectQuestion(int questionNumber) {
         Cell cell = getCellByQuestionNumber(questionNumber);
         if (cell == null) {
@@ -104,6 +144,11 @@ public class Board {
         return String.valueOf(promptQuestionAndAnswers(cell));
     }
 
+    /**
+     * Get the cell by question number
+     * @param questionNumber the question number
+     * @return the cell
+     */
     public Cell getCellByQuestionNumber(int questionNumber) {
         int counter = 1;
         for (int row = 0; row < BOARD_SIZE; row++) {
@@ -119,6 +164,10 @@ public class Board {
         return null;
     }
 
+    /**
+     * Display the pretty board
+     * @return a string with the pretty board
+     */
     public String displayPrettyBoard() {
         StringBuilder prettyBoard = new StringBuilder();
         int counter = 1;
@@ -154,6 +203,11 @@ public class Board {
         return prettyBoard.toString();
     }
 
+    /**
+     * Populate the board with questions and answers
+     * @param questionsByCategory each category has a list of questions
+     * @param answersById         each question has a list of answers
+     */
     private void populateBoardWithQuestionsAndAnswers(Map<String, ArrayList<Question>> questionsByCategory, Map<String, ArrayList<Answer>> answersById) {
         List<String> categories = new ArrayList<>(questionsByCategory.keySet());
 
@@ -169,6 +223,10 @@ public class Board {
                     if (row < questions.size()) {
                         Question question = questions.get(row);
                         ArrayList<Answer> answers = answersById.get(question.id);
+
+                        // Shuffle the multiple-choice answers order
+                        Collections.shuffle(answers);
+
                         gameBoard[row][col] = Cell.createCell(question, answers);
                     } else {
                         gameBoard[row][col] = null;
@@ -178,6 +236,10 @@ public class Board {
         });
     }
 
+    /**
+     * Get the answers
+     * @return a map with the answers
+     */
     private Map<String, ArrayList<Answer>> getAnswers() {
         return CSVReader.readItems(ANSWERS_FILE_PATH, columns -> {
             String id = columns[0];
@@ -187,6 +249,10 @@ public class Board {
         }, 0);
     }
 
+    /**
+     * Get the questions
+     * @return a map with the questions
+     */
     private Map<String, ArrayList<Question>> getQuestions() {
         return CSVReader.readItems(QUESTIONS_FILE_PATH, columns -> {
             String id = columns[0];

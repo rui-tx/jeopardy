@@ -8,6 +8,5 @@ public class Main {
 
         Server server = new Server(15000);
         server.start();
-
     }
 }
