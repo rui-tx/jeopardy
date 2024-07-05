@@ -13,10 +13,6 @@
 
 Our game is inspired by the game show [Jeopardy!](https://static.wikia.nocookie.net/gameshows/images/0/03/Jeopardy%21_1984.JPG/revision/latest?cb=20231027004918)
 
---- 
-
-## About
-
 - Simple quiz game
 - Has multiple categories ranging from easy to difficult
 - Multiplayer
@@ -55,7 +51,8 @@ There were at least a couple of flaws/bugs/missing features with the game
 - Restart the game without a server restart
 - Better answered question check system
 - Implement a buzzer
-
+  
+---
 
 ## Q&A
 
