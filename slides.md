@@ -6,8 +6,7 @@
 
 Inspired by
 ![Jeopardy!](https://static.wikia.nocookie.net/gameshows/images/0/03/Jeopardy%21_1984.JPG/revision/latest?cb=20231027004918)
-
-
+<!-- .element height="50%" width="50%" -->
 
 --- 
 
@@ -33,7 +32,7 @@ Inspired by
 
 ## Spot the Bug
 
-There were atleast 4 flaws/bugs/missing features with the game
+There were atleast a couple of flaws/bugs/missing features with the game
 
 ### Did you spot them all?
 
@@ -47,6 +46,8 @@ There were atleast 4 flaws/bugs/missing features with the game
 
 - Mulitple game sessions
 - Better player waiting system
+- Restart the game without a server restart
+- Better answered question check system
 - Implement a buzzer
 
 ---
