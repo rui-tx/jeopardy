@@ -51,7 +51,7 @@ There were at least a couple of flaws/bugs/missing features with the game
 - Restart the game without a server restart
 - Better answered question check system
 - Implement a buzzer
-  
+
 ---
 
 ## Q&A
