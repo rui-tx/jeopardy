@@ -4,6 +4,7 @@
 
 ## Jeopardy! (like)
 
+Inspired by
 ![Jeopardy!](https://static.wikia.nocookie.net/gameshows/images/0/03/Jeopardy%21_1984.JPG/revision/latest?cb=20231027004918)
 
 --- 
@@ -28,6 +29,13 @@
 
 ---
 
+## Spot the Bug
+
+There were atleast 4 flaws/bugs/missing features with the game
+
+### Did you spot them all?
+
+---
 ## Who wants to see mediocre code?
 
 ---
