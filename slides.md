@@ -34,14 +34,6 @@ Our game is inspired (and *like*) by the game show [Jeopardy!](https://static.wi
 
 ---
 
-## Spot the Bug
-
-There were at least a couple of flaws/bugs/missing features with the game
-
-### Did you spot them all?
-
----
-
 ## Who wants to see mediocre code?
 
 ---
