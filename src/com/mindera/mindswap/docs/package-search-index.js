@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"com.mindera.mindswap"},{"l":"com.mindera.mindswap.board"},{"l":"com.mindera.mindswap.client"},{"l":"com.mindera.mindswap.client.commands"},{"l":"com.mindera.mindswap.server"},{"l":"com.mindera.mindswap.utils"}];updateSearchResults();
