@@ -38,11 +38,17 @@ public class Server {
         currentPlayerIndex = 0;
     }
 
-
+    /**
+     * Starts the server on the given port.
+     */
     public void start() {
         this.start(this.port);
     }
 
+    /**
+     * Starts the server on the given port.
+     * @param port The port to start the server on.
+     */
     public void start(int port) {
         try {
             serverSocket = new ServerSocket(port);
@@ -60,7 +66,6 @@ public class Server {
                         return;
                     }
                 }
-                //broadcast("[server] " + "Game will start in 10 seconds.");
                 gameStart();
             }));
 
@@ -72,6 +77,10 @@ public class Server {
         }
     }
 
+    /**
+     * Accepts a new connection from a client.
+     * @throws IOException  If an I/O error occurs.
+     */
     public void acceptConnection() throws IOException {
         Socket clientSocket = serverSocket.accept();
         if (clients.size() + 1 > MAX_CLIENTS) {
@@ -87,14 +96,26 @@ public class Server {
         threads.submit(clientConnectionHandler);
     }
 
+    /**
+     * Adds a client to the list of clients.
+     * @param cHandler The client to add.
+     */
     private void addClient(ClientConnectionHandler cHandler) {
         clients.add(cHandler);
     }
 
+    /**
+     * Broadcasts a message to all clients.
+     * @param message The message to broadcast.
+     */
     public void broadcast(String message) {
         clients.forEach(handler -> handler.send(message));
     }
 
+    /**
+     * Starts the game.
+     * This method will wait for all clients to be ready before starting the game.
+     */
     public void gameStart() {
 
         while (!clients.stream().allMatch(ClientConnectionHandler::isReady)) {
@@ -121,6 +142,9 @@ public class Server {
         clients.clear();
     }
 
+    /**
+     * Finalizes the game by broadcasting the final scoreboard and sending the winner's name and score.
+     */
     private void finalScoreboard() {
         broadcast(ANSI_CYAN + " FINAL SCORES \n" + ANSI_RESET);
         sendScoreboard();
@@ -141,6 +165,9 @@ public class Server {
         });
     }
 
+    /**
+     * Sends the scoreboard to all clients.
+     */
     private void sendScoreboard() {
         StringBuilder prettyScoreboard = new StringBuilder();
         prettyScoreboard.append(ANSI_CYAN + " =========== SCOREBOARD ========== \n" + ANSI_RESET);
@@ -155,6 +182,10 @@ public class Server {
         broadcast(prettyScoreboard.toString());
     }
 
+    /**
+     * Collects the answers from all clients.
+     * @return A map of clients and their selected answers.
+     */
     private Map<ClientConnectionHandler, Integer> collectAnswers() {
         Map<ClientConnectionHandler, Integer> playerAnswers = new HashMap<>();
         List<Thread> answerThreads = new ArrayList<>();
@@ -188,6 +219,11 @@ public class Server {
         return playerAnswers;
     }
 
+    /**
+     * Broadcasts the question and answers to all clients.
+     * @param questionNumber The number of the question to broadcast.
+     * @param currentHandler The current client to broadcast the question and answers.
+     */
     private void broadcastQuestionAndAnswers(int questionNumber, ClientConnectionHandler currentHandler) {
         // Broadcast the selected question to all players
         String questionResponse = board.selectQuestion(questionNumber);
@@ -200,6 +236,11 @@ public class Server {
         broadcast("/state answer");
     }
 
+    /**
+     * Handles the question selection for the current player.
+     * @param currentHandler The current client to handle the question selection.
+     * @return The number of the selected question.
+     */
     private int handleQuestionSelection(ClientConnectionHandler currentHandler) {
         broadcast(ANSI_WHITE + currentHandler.getName() + " is selecting a question, please wait..." + ANSI_RESET);
         currentHandler.send("/unlock");
@@ -228,15 +269,25 @@ public class Server {
         return questionNumber;
     }
 
+    /**
+     * Selects the next player to play.
+     * @return The next player to play.
+     * If the current player is the last player, the first player will be returned.
+     */
     private ClientConnectionHandler selectPlayer() {
         ClientConnectionHandler currentPlayer = clients.get(currentPlayerIndex);
         currentPlayerIndex = (currentPlayerIndex + 1) % clients.size();
         return currentPlayer;
     }
 
+    /**
+     * Handles the game turn for the current player.
+     * @return The name of the winner.
+     * If no winner is found, the method will return "No winner in this round".
+     * If the game is over, the method will return the name of the winner.
+     */
     private String gameTurn() {
         String winner = "No winner in this round";
-        String fastestPlayer = "";
         long lowestTime = 1_000_000_000;
         Set<ClientConnectionHandler> winners = new HashSet<>();
 
@@ -264,7 +315,7 @@ public class Server {
                 lowestTime = handler.getMessageTime();
             }
 
-            // check if a player guessed correctly
+            // Check if a player guessed correctly
             if (board.checkAnswerBool(questionNumber, selectedAnswer)) {
                 winners.add(handler);
             }
@@ -289,6 +340,9 @@ public class Server {
     }
 
 
+    /**
+     * Handles a client connection.
+     */
     public class ClientConnectionHandler implements Runnable {
 
         private final Socket clientSocket;
@@ -303,6 +357,12 @@ public class Server {
         private int score;
         private boolean isReady;
 
+        /**
+         * Creates a new client connection handler.
+         * @param clientSocket The client socket.
+         * @param name The name of the client.
+         * @throws IOException If an I/O error occurs.
+         */
         public ClientConnectionHandler(Socket clientSocket, String name) throws IOException {
             this.clientSocket = clientSocket;
             this.name = name;
@@ -313,7 +373,9 @@ public class Server {
             this.isReady = false;
         }
 
-
+        /**
+         * Runs the client connection handler.
+         */
         @Override
         public void run() {
             addClient(this);
@@ -325,6 +387,10 @@ public class Server {
             broadcast("[server] " + this.getName() + " connected");
         }
 
+        /**
+         * Gets the answer from the client.
+         * @return The answer from the client.
+         */
         public synchronized String getAnswer() {
             String encodedMessage = "";
             String newMessage = "";
@@ -356,6 +422,9 @@ public class Server {
             return this.message;
         }
 
+        /**
+         * Changes the name of the client.
+         */
         public void changeName() {
             while (!name.matches("[a-zA-Z0-9]+")) {
                 try {
@@ -370,11 +439,19 @@ public class Server {
             }
         }
 
+        /**
+         * Removes a client from the list of clients.
+         * @param cHandler The client to remove.
+         */
         public void removeClient(ClientConnectionHandler cHandler) {
             clients.remove(cHandler);
             cHandler.close();
         }
 
+        /**
+         * Sends a message to the client.
+         * @param message The message to send.
+         */
         public void send(String message) {
             try {
                 synchronized (out) {
@@ -389,6 +466,9 @@ public class Server {
             }
         }
 
+        /**
+         * Closes the client connection.
+         */
         public void close() {
             try {
                 clientSocket.close();
@@ -397,40 +477,74 @@ public class Server {
             }
         }
 
+        /**
+         * Sends the welcome message and banner to the client.
+         */
         private void welcome() {
             send(WELCOME_MESSAGE);
             send(BANNER);
             send("/sound intro");
         }
 
+        /**
+         * Gets the name of the client.
+         * @return The name of the client.
+         */
         public String getName() {
             return name;
         }
 
+        /**
+         * Gets the message time of the last message received from the client.
+         * @return The message time of the last message received from the client.
+         */
         public long getMessageTime() {
             return messageTime;
         }
 
+        /**
+         * Gets the number of turns won by the client.
+         * @return The number of turns won by the client.
+         */
         public int getTurnsWon() {
             return turnsWon;
         }
 
+        /**
+         * Increases the number of turns won by the client by 1.
+         */
         public void turnWon() {
             turnsWon++;
         }
 
+        /**
+         * Gets the score of the client.
+         * @return The score of the client.
+         */
         public int getScore() {
             return score;
         }
 
+        /**
+         * Increases the score of the client by the given points.
+         * @param points The points to increase the score by.
+         */
         public void increaseScore(int points) {
             score += points;
         }
 
+        /**
+         * Checks if the client is ready.
+         * @return True if the client is ready, false otherwise.
+         */
         public boolean isReady() {
             return isReady;
         }
 
+        /**
+         * Sets the ready status of the client.
+         * @param ready The ready status of the client.
+         */
         public void setReady(boolean ready) {
             isReady = ready;
         }
