@@ -1,5 +1,7 @@
 # Project1
 
+## Mindera Mindswap
+
 ---
 
 ## Our group
