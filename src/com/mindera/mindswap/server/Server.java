@@ -31,11 +31,11 @@ public class Server {
     private int currentPlayerIndex;
 
     public Server(int port) {
-        clients = new CopyOnWriteArrayList<>();
         this.port = port;
-        this.gameStarted = false;
-        board = new Board();
+        gameStarted = false;
         currentPlayerIndex = 0;
+        clients = new CopyOnWriteArrayList<>();
+        board = new Board();
     }
 
     /**
@@ -128,7 +128,7 @@ public class Server {
         }
 
         clients.forEach(handler -> handler.send(Messages.GAME_STARTED.toString()));
-        this.gameStarted = true;
+        gameStarted = true;
 
         String winner = "";
         while (!board.isGameOver()) {
@@ -182,33 +182,79 @@ public class Server {
         broadcast(prettyScoreboard.toString());
     }
 
-    /**
-     * Collects the answers from all clients.
-     * @return A map of clients and their selected answers.
-     */
+
     private Map<ClientConnectionHandler, Integer> collectAnswers() {
         Map<ClientConnectionHandler, Integer> playerAnswers = new HashMap<>();
-        List<Thread> answerThreads = new ArrayList<>();
+        List<Thread> countdownThreads = new ArrayList<>();
 
         for (ClientConnectionHandler handler : clients) {
-            Thread answerThread = new Thread(() -> {
+            Thread countdownThread = new Thread(() -> {
                 handler.send("/sound cue1");
-                String input = handler.getAnswer();
+
+                // Countdown and input handling
+                final int countdownTime = 10; // seconds
+                final boolean[] inputReceived = {false};
+                final String[] input = {null};
+
+                Thread inputThread = new Thread(() -> {
+                    input[0] = handler.getAnswer();
+                    synchronized (inputReceived) {
+                        inputReceived[0] = true;
+                        inputReceived.notify();
+                    }
+                });
+
+                inputThread.start();
+
+                for (int i = countdownTime; i >= 0; i--) {
+                    try {
+
+                        // Send countdown message
+                        handler.send("Time remaining: " + i + " seconds");
+
+                        // Check if input is received
+                        synchronized (inputReceived) {
+                            if (inputReceived[0]) {
+                                break;
+                            }
+                        }
+
+                        // Wait for 1 second
+                        Thread.sleep(1000);
+
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        return;
+                    }
+                }
+
+                // Lock input after countdown
+                handler.send("Time remaining: 0 seconds");
                 handler.send("/lock");
-                if (input == null) {
+
+                // Interrupt input thread if time is up and input not received
+                if (!inputReceived[0]) {
+                    inputThread.interrupt();
+                    input[0] = "-1"; // Mark as wrong answer if not responded in time
+                }
+
+                if (input[0] == null) {
                     return;
                 }
-                String cleanedInput = input.replaceAll("\\s", ""); // Remove all white spaces
+
+                String cleanedInput = input[0].replaceAll("\\s", ""); // Remove all white spaces
                 int selectedAnswer = Integer.parseInt(cleanedInput);
+
                 synchronized (playerAnswers) {
                     playerAnswers.put(handler, selectedAnswer);
                 }
             });
-            answerThreads.add(answerThread);
-            answerThread.start();
+
+            countdownThreads.add(countdownThread);
+            countdownThread.start();
         }
 
-        for (Thread thread : answerThreads) {
+        for (Thread thread : countdownThreads) {
             try {
                 thread.join();
             } catch (InterruptedException e) {
@@ -216,6 +262,7 @@ public class Server {
                 return null;
             }
         }
+
         return playerAnswers;
     }
 
